@@ -11,7 +11,7 @@ async function bootstrap() {
     }),
   });
   app.enableCors();
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('/v1/api');
   await app.listen(process.env.HTTP_PORT ?? 8080);
 }
 
