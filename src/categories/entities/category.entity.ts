@@ -7,9 +7,10 @@ import {
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
+import { ICategoryEntity } from '../interfaces/categories.interface';
 
 @Entity('categories', { name: 'categories' })
-export class Category {
+export class Category implements ICategoryEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

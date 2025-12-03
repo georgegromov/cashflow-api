@@ -1,3 +1,5 @@
+import { Response } from 'express';
+
 export interface SignUpDto {
   readonly username: string;
   readonly password: string;
@@ -8,21 +10,21 @@ export interface SignInDto {
   readonly password: string;
 }
 
-export type SignInReturn = { accessToken: string };
+export type SignUpReturn = { accessToken: string };
+export type SignInReturn = SignUpReturn;
 
 export interface IAuthService {
-  signUp(signUpDto: SignUpDto): Promise<void>;
+  signUp(signUpDto: SignUpDto): Promise<SignUpReturn>;
   signIn(signInDto: SignInDto): Promise<SignInReturn>;
   signOut(): Promise<void>;
 }
 
 export interface IAuthController {
-  signUp(signUpDto: SignUpDto): Promise<void>;
-  signIn(signInDto: SignInDto): Promise<void>;
-  signOut(): Promise<void>;
+  signUp(signUpDto: SignUpDto, res: Response): Promise<SignUpReturn>;
+  signIn(signInDto: SignInDto, res: Response): Promise<SignInReturn>;
+  signOut(res: Response): Promise<void>;
 }
 
 export interface JwtPayload {
   sub: string;
-  username: string;
 }

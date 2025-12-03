@@ -8,11 +8,13 @@ import {
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
-
-export type TransactionType = 'income' | 'expense';
+import {
+  ITransactionEntity,
+  type TransactionType,
+} from '../interfaces/transactions.interface';
 
 @Entity('transactions', { name: 'transactions' })
-export class Transaction {
+export class Transaction implements ITransactionEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

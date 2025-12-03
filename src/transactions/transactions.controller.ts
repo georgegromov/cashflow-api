@@ -1,48 +1,36 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Logger } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import {
+  ITransactionController,
+  type ICreateTransactionDto,
+} from './interfaces/transactions.interface';
+import { type JwtPayload } from 'src/auth/interfaces/auth.inferface';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('transactions')
-export class TransactionsController {
+export class TransactionsController implements ITransactionController {
   private readonly logger = new Logger(TransactionsController.name);
 
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  create(
+    @Body() createTransactionDto: ICreateTransactionDto,
+    @CurrentUser() curretUser: JwtPayload,
+  ) {
+    return this.transactionsService.create(
+      curretUser.sub,
+      createTransactionDto,
+    );
   }
 
   @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  findAll(@CurrentUser() curretUser: JwtPayload) {
+    return this.transactionsService.findAll(curretUser.sub);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transactionsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateTransactionDto: UpdateTransactionDto,
-  ) {
-    return this.transactionsService.update(+id, updateTransactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionsService.remove(+id);
+  findOne(@Param('id') id: string, @CurrentUser() curretUser: JwtPayload) {
+    return this.transactionsService.findOne(id, curretUser.sub);
   }
 }

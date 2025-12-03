@@ -17,11 +17,9 @@ export class UsersService implements IUserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<string> {
-    const passwordHash = await bcrypt.hash(createUserDto.passwordHash, 10);
-
     const newUser = this.usersRepository.create({
       username: createUserDto.username,
-      password_hash: passwordHash,
+      password_hash: createUserDto.passwordHash,
     });
 
     const createdUser = await this.usersRepository.save(newUser);
@@ -32,8 +30,31 @@ export class UsersService implements IUserService {
     return await this.usersRepository.find();
   }
 
-  async findOne(id: string): Promise<User | null> {
-    return await this.usersRepository.findOneBy({ id });
+  async findOne(
+    params: { userId: string } | { username: string },
+    options?: { withPassword?: boolean },
+  ): Promise<User | null> {
+    const { withPassword } = options || {};
+
+    if ('userId' in params) {
+      return await this.usersRepository.findOne({
+        where: { id: params.userId },
+        select: withPassword
+          ? ['id', 'username', 'password_hash', 'created_at']
+          : undefined,
+      });
+    }
+
+    if ('username' in params) {
+      return await this.usersRepository.findOne({
+        where: { username: params.username },
+        select: withPassword
+          ? ['id', 'username', 'password_hash', 'created_at']
+          : undefined,
+      });
+    }
+
+    return null;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<string> {

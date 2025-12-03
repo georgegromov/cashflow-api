@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -19,12 +20,16 @@ declare module 'express' {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
+
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    this.logger.log('touching AuthGuard.canActivate');
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -35,7 +40,9 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+    const token = this.extractTokenFromRequest(request);
+
+    console.log('token:', token);
 
     if (!token) {
       throw new UnauthorizedException();
@@ -47,15 +54,26 @@ export class AuthGuard implements CanActivate {
       });
 
       request[USER_REQUEST_KEY] = payload;
-    } catch {
+    } catch (e) {
+      this.logger.error('catch error', e);
       throw new UnauthorizedException();
     }
 
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
+  private extractTokenFromRequest(request: Request): string | undefined {
+    this.logger.log('touching AuthGuard.extractTokenFromRequest');
+
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    if (type === 'Bearer' && token) {
+      return token;
+    }
+
+    if (typeof request.cookies?.access_token === 'string') {
+      return request.cookies.access_token;
+    }
+
+    return undefined;
   }
 }

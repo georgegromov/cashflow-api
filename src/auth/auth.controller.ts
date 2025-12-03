@@ -1,10 +1,14 @@
-import { Controller, Logger, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Logger, Post, Res } from '@nestjs/common';
 import {
   IAuthController,
-  SignInDto,
-  SignUpDto,
+  SignInReturn,
+  SignUpReturn,
+  type SignInDto,
+  type SignUpDto,
 } from './interfaces/auth.inferface';
 import { AuthService } from './auth.service';
+import { Public } from './decorators/public.decorator';
+import { type Response } from 'express';
 
 @Controller('auth')
 export class AuthController implements IAuthController {
@@ -12,18 +16,52 @@ export class AuthController implements IAuthController {
 
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  signUp(signUpDto: SignUpDto): Promise<void> {
-    throw new Error('Method not implemented.');
+  @Public()
+  @Post('sign-up')
+  @HttpCode(201)
+  async signUp(
+    @Body() signUpDto: SignUpDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SignUpReturn> {
+    const result = await this.authService.signUp(signUpDto);
+
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return result;
   }
 
-  @Post()
-  signIn(signInDto: SignInDto): Promise<void> {
-    throw new Error('Method not implemented.');
+  @Public()
+  @Post('sign-in')
+  @HttpCode(200)
+  async signIn(
+    @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SignInReturn> {
+    const result = await this.authService.signIn(signInDto);
+
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
+    return result;
   }
 
-  @Post()
-  signOut(): Promise<void> {
-    throw new Error('Method not implemented.');
+  @Public()
+  @Post('sign-out')
+  @HttpCode(204)
+  signOut(@Res({ passthrough: true }) res: Response): Promise<void> {
+    res.clearCookie('access_token');
+    res.status(204).send();
+    return this.authService.signOut();
   }
 }

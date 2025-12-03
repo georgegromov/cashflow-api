@@ -20,7 +20,10 @@ export interface IUpdateUserDto {
 export interface IUserService {
   create(createUserDto: ICreateUserDto): Promise<string>;
   findAll(): Promise<User[]>;
-  findOne(id: string): Promise<User | null>;
+  findOne(
+    params: { userId: string } | { username: string },
+    options?: { withPassword?: boolean },
+  ): Promise<User | null>;
   update(id: string, updateUserDto: IUpdateUserDto): Promise<string>;
   delete(id: string): Promise<string>;
 }

@@ -1,28 +1,65 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transaction } from './entities/transaction.entity';
+import { Repository } from 'typeorm';
+import { ICreateTransactionDto } from './interfaces/transactions.interface';
 
 @Injectable()
 export class TransactionsService {
   private readonly logger = new Logger(TransactionsService.name);
 
-  create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
+  constructor(
+    @InjectRepository(Transaction)
+    private transactionsRepository: Repository<Transaction>,
+  ) {}
+
+  async create(userId: string, createTransactionDto: ICreateTransactionDto) {
+    if (createTransactionDto.categoryId) {
+      const category = await this.transactionsRepository.findOne({
+        where: {
+          id: createTransactionDto.categoryId,
+          user: { id: userId },
+        },
+      });
+
+      if (!category) {
+        this.logger.error('category does not exist or not belongs to user');
+        throw new BadRequestException(
+          `category with id:${createTransactionDto.categoryId} does not exists`,
+        );
+      }
+    }
+
+    const transaction = this.transactionsRepository.create({
+      amount: createTransactionDto.amount,
+      type: createTransactionDto.type,
+      category: { id: createTransactionDto.categoryId },
+    });
+
+    const created = await this.transactionsRepository.save(transaction);
+    return created.id;
   }
 
-  findAll() {
-    return `This action returns all transactions`;
+  findAll(userId: string) {
+    return this.transactionsRepository.find({
+      where: { user: { id: userId } },
+      order: { created_at: 'DESC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
-  }
+  async findOne(id: string, userId: string) {
+    const transaction = await this.transactionsRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+    if (!transaction) {
+      throw new NotFoundException(`transaction with id:${id} is not found`);
+    }
+    return transaction;
   }
 }
