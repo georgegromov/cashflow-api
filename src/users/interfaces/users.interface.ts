@@ -1,5 +1,3 @@
-import { User } from '../entities/user.entity';
-
 export interface IUserEntity {
   id: string;
   username: string;
@@ -17,21 +15,21 @@ export interface IUpdateUserDto {
   readonly passwordHash?: string;
 }
 
-export interface IUserService {
+export interface IUsersService {
   create(createUserDto: ICreateUserDto): Promise<string>;
-  findAll(): Promise<User[]>;
+  findAll(): Promise<IUserEntity[]>;
   findOne(
     params: { userId: string } | { username: string },
     options?: { withPassword?: boolean },
-  ): Promise<User | null>;
+  ): Promise<IUserEntity | null>;
   update(id: string, updateUserDto: IUpdateUserDto): Promise<string>;
   delete(id: string): Promise<string>;
 }
 
-export interface IUserController {
+export interface IUsersController {
   create(): Promise<void>;
-  findAll(): Promise<User[]>;
-  findOne(): Promise<User | null>;
+  findAll(): Promise<IUserEntity[]>;
+  findOne(): Promise<IUserEntity | null>;
   update(): void;
   delete(): Promise<void>;
 }

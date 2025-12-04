@@ -1,14 +1,17 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { IUserService } from './interfaces/users.interface';
+import {
+  ICreateUserDto,
+  IUpdateUserDto,
+  IUserEntity,
+  IUsersService,
+} from './interfaces/users.interface';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UsersService implements IUserService {
+export class UsersService implements IUsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
@@ -16,7 +19,7 @@ export class UsersService implements IUserService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<string> {
+  async create(createUserDto: ICreateUserDto): Promise<string> {
     const newUser = this.usersRepository.create({
       username: createUserDto.username,
       password_hash: createUserDto.passwordHash,
@@ -26,14 +29,14 @@ export class UsersService implements IUserService {
     return createdUser.id;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<IUserEntity[]> {
     return await this.usersRepository.find();
   }
 
   async findOne(
     params: { userId: string } | { username: string },
     options?: { withPassword?: boolean },
-  ): Promise<User | null> {
+  ): Promise<IUserEntity | null> {
     const { withPassword } = options || {};
 
     if ('userId' in params) {
@@ -57,8 +60,8 @@ export class UsersService implements IUserService {
     return null;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<string> {
-    const updateData: Partial<User> = {
+  async update(id: string, updateUserDto: IUpdateUserDto): Promise<string> {
+    const updateData: Partial<IUserEntity> = {
       username: updateUserDto.username,
     };
 
