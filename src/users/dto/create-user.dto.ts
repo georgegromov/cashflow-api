@@ -1,16 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ICreateUserDto } from '../interfaces/users.interface';
 
+@ApiSchema()
 export class CreateUserDto implements ICreateUserDto {
-  @ApiProperty({
-    example: 'john_doe',
-    description: 'Username of the new user',
-  })
+  @ApiProperty()
   readonly username: string;
 
-  @ApiProperty({
-    example: 'my_strong_password',
-    description: 'Raw password (will be hashed)',
-  })
-  readonly passwordHash: string;
+  @ApiProperty()
+  readonly password: string;
 }

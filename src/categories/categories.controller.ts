@@ -15,7 +15,9 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { type JwtPayload } from 'src/auth/interfaces/auth.inferface';
 import { ICategoryController } from './interfaces/categories.interface';
+import { ApiCookieAuth } from '@nestjs/swagger';
 
+@ApiCookieAuth('access_token')
 @Controller('categories')
 export class CategoriesController implements ICategoryController {
   private readonly logger = new Logger(CategoriesController.name);

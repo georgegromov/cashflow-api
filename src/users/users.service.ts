@@ -22,7 +22,7 @@ export class UsersService implements IUsersService {
   async create(createUserDto: ICreateUserDto): Promise<string> {
     const newUser = this.usersRepository.create({
       username: createUserDto.username,
-      password_hash: createUserDto.passwordHash,
+      password_hash: createUserDto.password,
     });
 
     const createdUser = await this.usersRepository.save(newUser);
@@ -65,11 +65,8 @@ export class UsersService implements IUsersService {
       username: updateUserDto.username,
     };
 
-    if (updateUserDto.passwordHash) {
-      updateData.password_hash = await bcrypt.hash(
-        updateUserDto.passwordHash,
-        10,
-      );
+    if (updateUserDto.password) {
+      updateData.password_hash = await bcrypt.hash(updateUserDto.password, 10);
     }
 
     const user = await this.usersRepository.preload({

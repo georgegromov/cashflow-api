@@ -23,17 +23,25 @@ async function bootstrap() {
 
   const document = new DocumentBuilder()
     .setTitle('CashFlowApi')
-    .setDescription('API description')
     .setVersion('1.0')
     .setBasePath('/api/v1')
+    .addCookieAuth('access_token')
     .build();
+
   const documentFactory = () =>
     SwaggerModule.createDocument(app, document, {
-      include: [AuthModule, UsersModule, CategoriesModule, TransactionsModule],
-      ignoreGlobalPrefix: false,
+      include: [
+        AppModule,
+        AuthModule,
+        UsersModule,
+        CategoriesModule,
+        TransactionsModule,
+      ],
     });
+
   SwaggerModule.setup('swagger', app, documentFactory, {
-    jsonDocumentUrl: 'swagger/download',
+    jsonDocumentUrl: 'swagger/json',
+    yamlDocumentUrl: 'swagger/yaml',
     useGlobalPrefix: true,
     customSiteTitle: 'CashFlow API Swagger',
   });

@@ -8,12 +8,11 @@ import {
   Delete,
   Logger,
 } from '@nestjs/common';
-import type {
-  IUpdateUserDto,
-  ICreateUserDto,
-} from './interfaces/users.interface';
 import { UsersService } from './users.service';
-
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiCookieAuth } from '@nestjs/swagger';
+@ApiCookieAuth('access_token')
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
@@ -21,7 +20,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: ICreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
@@ -36,12 +35,12 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: IUpdateUserDto) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  delete(@Param('id') id: string) {
     return this.usersService.delete(id);
   }
 }

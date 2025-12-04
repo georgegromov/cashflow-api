@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Param, Logger } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
-import {
-  ITransactionController,
-  type ICreateTransactionDto,
-} from './interfaces/transactions.interface';
+import { ITransactionController } from './interfaces/transactions.interface';
 import { type JwtPayload } from 'src/auth/interfaces/auth.inferface';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { ApiCookieAuth } from '@nestjs/swagger';
 
+@ApiCookieAuth('access_token')
 @Controller('transactions')
 export class TransactionsController implements ITransactionController {
   private readonly logger = new Logger(TransactionsController.name);
@@ -15,7 +15,7 @@ export class TransactionsController implements ITransactionController {
 
   @Post()
   create(
-    @Body() createTransactionDto: ICreateTransactionDto,
+    @Body() createTransactionDto: CreateTransactionDto,
     @CurrentUser() curretUser: JwtPayload,
   ) {
     return this.transactionsService.create(

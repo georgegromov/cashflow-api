@@ -8,9 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import {
   IAuthService,
-  SignInDto,
+  ISignInDto,
   SignInReturn,
-  SignUpDto,
+  ISignUpDto,
   SignUpReturn,
 } from './interfaces/auth.inferface';
 import * as bcrypt from 'bcrypt';
@@ -24,7 +24,7 @@ export class AuthService implements IAuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<SignUpReturn> {
+  async signUp(signUpDto: ISignUpDto): Promise<SignUpReturn> {
     const { username, password } = signUpDto;
 
     const foundUser = await this.usersService.findOne({ username });
@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
 
     const createdUserId = await this.usersService.create({
       username: username,
-      passwordHash: hash,
+      password: hash,
     });
 
     this.logger.log(`new user registered: ${username}`);
@@ -49,7 +49,7 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async signIn(signInDto: SignInDto): Promise<SignInReturn> {
+  async signIn(signInDto: ISignInDto): Promise<SignInReturn> {
     const user = await this.usersService.findOne(
       {
         username: signInDto.username,

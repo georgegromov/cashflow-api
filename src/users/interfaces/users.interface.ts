@@ -7,12 +7,12 @@ export interface IUserEntity {
 
 export interface ICreateUserDto {
   readonly username: string;
-  readonly passwordHash: string;
+  readonly password: string;
 }
 
 export interface IUpdateUserDto {
   readonly username?: string;
-  readonly passwordHash?: string;
+  readonly password?: string;
 }
 
 export interface IUsersService {

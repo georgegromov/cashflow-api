@@ -4,16 +4,20 @@ services:
   api:
     build: .
     container_name: cashflow_api
+    env_file: .env.docker
     ports:
-      - "${HTTP_PORT}:8080"
+      - "8081:8080"
     depends_on:
       database:
-        condition: service_started
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
     networks:
       - internal
   database:
     image: postgres:17
-    env_file: .env
+    env_file: .env.docker
     container_name: cashflow_database
     environment:
       POSTGRES_USER: ${DATABASE_USER}
@@ -22,7 +26,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
-      - "${DATABASE_PORT}:5432"
+      - "5431:5432"
     networks:
       - internal
     healthcheck:

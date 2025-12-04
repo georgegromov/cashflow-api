@@ -3,12 +3,12 @@ import {
   IAuthController,
   SignInReturn,
   SignUpReturn,
-  type SignInDto,
-  type SignUpDto,
 } from './interfaces/auth.inferface';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { type Response } from 'express';
+import { SignUpDto } from './dto/sign-up.dto';
+import { SignInDto } from './dto/sign-in.dto';
 
 @Controller('auth')
 export class AuthController implements IAuthController {

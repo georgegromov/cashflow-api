@@ -1,11 +1,11 @@
 import { Response } from 'express';
 
-export interface SignUpDto {
+export interface ISignUpDto {
   readonly username: string;
   readonly password: string;
 }
 
-export interface SignInDto {
+export interface ISignInDto {
   readonly username: string;
   readonly password: string;
 }
@@ -14,14 +14,14 @@ export type SignUpReturn = { accessToken: string };
 export type SignInReturn = SignUpReturn;
 
 export interface IAuthService {
-  signUp(signUpDto: SignUpDto): Promise<SignUpReturn>;
-  signIn(signInDto: SignInDto): Promise<SignInReturn>;
+  signUp(signUpDto: ISignUpDto): Promise<SignUpReturn>;
+  signIn(signInDto: ISignInDto): Promise<SignInReturn>;
   signOut(): Promise<void>;
 }
 
 export interface IAuthController {
-  signUp(signUpDto: SignUpDto, res: Response): Promise<SignUpReturn>;
-  signIn(signInDto: SignInDto, res: Response): Promise<SignInReturn>;
+  signUp(signUpDto: ISignUpDto, res: Response): Promise<SignUpReturn>;
+  signIn(signInDto: ISignInDto, res: Response): Promise<SignInReturn>;
   signOut(res: Response): Promise<void>;
 }
 
