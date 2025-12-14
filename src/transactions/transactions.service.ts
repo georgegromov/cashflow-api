@@ -38,7 +38,7 @@ export class TransactionsService {
     const transaction = this.transactionsRepository.create({
       amount: createTransactionDto.amount,
       type: createTransactionDto.type,
-      category: { id: createTransactionDto.categoryId },
+      category: { id: createTransactionDto.categoryId ?? null },
     });
 
     const created = await this.transactionsRepository.save(transaction);
