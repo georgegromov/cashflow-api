@@ -8,10 +8,7 @@ import {
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import {
-  ITransactionEntity,
-  type TransactionType,
-} from '../interfaces/transactions.interface';
+import { ITransactionEntity } from '../interfaces/transactions.interface';
 
 @Entity('transactions', { name: 'transactions' })
 export class Transaction implements ITransactionEntity {
@@ -25,7 +22,7 @@ export class Transaction implements ITransactionEntity {
     type: 'enum',
     enum: ['income', 'expense'],
   })
-  type: TransactionType;
+  type: 'income' | 'expense';
 
   @ManyToOne(() => User, (u) => u.transactions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

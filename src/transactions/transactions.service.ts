@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { ICreateTransactionDto } from './interfaces/transactions.interface';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class TransactionsService {
@@ -16,11 +17,16 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
+
+    @InjectRepository(Category)
+    private readonly categoriesRepository: Repository<Category>,
   ) {}
 
   async create(userId: string, createTransactionDto: ICreateTransactionDto) {
+    let category: Category | null = null;
+
     if (createTransactionDto.categoryId) {
-      const category = await this.transactionsRepository.findOne({
+      category = await this.categoriesRepository.findOne({
         where: {
           id: createTransactionDto.categoryId,
           user: { id: userId },
@@ -38,7 +44,8 @@ export class TransactionsService {
     const transaction = this.transactionsRepository.create({
       amount: createTransactionDto.amount,
       type: createTransactionDto.type,
-      category: { id: createTransactionDto.categoryId ?? null },
+      user: { id: userId },
+      category,
     });
 
     const created = await this.transactionsRepository.save(transaction);

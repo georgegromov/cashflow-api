@@ -5,6 +5,7 @@ import { User } from 'src/users/entities/user.entity';
 export interface ICategoryEntity {
   id: string;
   name: string;
+  type: 'income' | 'expense';
   user: User;
   created_at: Date;
 }

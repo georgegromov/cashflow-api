@@ -6,6 +6,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 import { ICategoryEntity } from '../interfaces/categories.interface';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
@@ -14,6 +15,7 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
   name: 'Category',
   description: 'Сущность категории, принадлежащей определённому пользователю.',
 })
+@Unique(['user', 'name'])
 @Entity('categories', { name: 'categories' })
 export class Category implements ICategoryEntity {
   @ApiProperty({
@@ -29,6 +31,16 @@ export class Category implements ICategoryEntity {
   })
   @Column()
   name: string;
+
+  @ApiProperty({
+    example: 'income',
+    description: 'Тип категории.',
+  })
+  @Column({
+    type: 'enum',
+    enum: ['income', 'expense'],
+  })
+  type: 'income' | 'expense';
 
   @ApiProperty({
     description: 'Пользователь, которому принадлежит категория.',

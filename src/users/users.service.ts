@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import {
   ICreateUserDto,
@@ -9,6 +9,28 @@ import {
   IUsersService,
 } from './interfaces/users.interface';
 import * as bcrypt from 'bcrypt';
+import { Category } from 'src/categories/entities/category.entity';
+import { ICategoryEntity } from 'src/categories/interfaces/categories.interface';
+
+type DefaultCategory = Omit<ICategoryEntity, 'id' | 'user' | 'created_at'>;
+
+export const DEFAULT_CATEGORIES: DefaultCategory[] = [
+  { name: 'Еда', type: 'expense' },
+  { name: 'Транспорт', type: 'expense' },
+  { name: 'Аренда жилья', type: 'expense' },
+  { name: 'Развлечение', type: 'expense' },
+  { name: 'Комунальные услуги', type: 'expense' },
+  { name: 'Красота и Здоровье', type: 'expense' },
+  { name: 'Такси и Каршеринг', type: 'expense' },
+  { name: 'Прочие расходы', type: 'expense' },
+  { name: 'Зарплата', type: 'income' },
+  { name: 'Проценты по вкладам', type: 'income' },
+  { name: 'Пенсия', type: 'income' },
+  { name: 'Стипендия', type: 'income' },
+  { name: 'Кешбек', type: 'income' },
+  { name: 'Доход от Аренды', type: 'income' },
+  { name: 'Прочее', type: 'income' },
+] as const;
 
 @Injectable()
 export class UsersService implements IUsersService {
@@ -17,16 +39,42 @@ export class UsersService implements IUsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(createUserDto: ICreateUserDto): Promise<string> {
-    const newUser = this.usersRepository.create({
-      username: createUserDto.username,
-      password_hash: createUserDto.password,
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    const createdUser = await this.usersRepository.save(newUser);
-    return createdUser.id;
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const user = queryRunner.manager.create(User, {
+        username: createUserDto.username,
+        password_hash: createUserDto.password,
+      });
+
+      const createdUser = await queryRunner.manager.save(user);
+
+      const categories = DEFAULT_CATEGORIES.map((c) =>
+        queryRunner.manager.create(Category, {
+          name: c.name,
+          type: c.type,
+          user: createdUser,
+        }),
+      );
+
+      await queryRunner.manager.save(categories);
+
+      await queryRunner.commitTransaction();
+      return createdUser.id;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error('User creation failed', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(): Promise<IUserEntity[]> {
