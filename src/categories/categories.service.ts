@@ -18,6 +18,7 @@ export class CategoriesService implements ICategoryService {
   async create(userId: string, createCategoryDto: CreateCategoryDto) {
     const category = this.categoriesRepository.create({
       name: createCategoryDto.name,
+      type: createCategoryDto.type,
       user: { id: userId },
     });
 
@@ -50,6 +51,7 @@ export class CategoriesService implements ICategoryService {
   ) {
     const updateData: Partial<Category> = {
       name: updateCategoryDto.name,
+      type: updateCategoryDto.type,
     };
     const category = await this.categoriesRepository.preload({
       id,

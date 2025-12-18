@@ -9,5 +9,7 @@ export class UpdateCategoryDto
   implements IUpdateCategoryDto
 {
   @ApiProperty()
-  name: string;
+  readonly name?: string;
+  @ApiProperty({ enum: ['income', 'expense'], required: false })
+  readonly type?: 'income' | 'expense';
 }

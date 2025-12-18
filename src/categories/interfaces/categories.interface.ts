@@ -12,10 +12,12 @@ export interface ICategoryEntity {
 
 export interface ICreateCategoryDto {
   readonly name: string;
+  readonly type: 'income' | 'expense';
 }
 
 export interface IUpdateCategoryDto {
   readonly name?: string;
+  readonly type?: 'income' | 'expense';
 }
 
 export interface ICategoryService {

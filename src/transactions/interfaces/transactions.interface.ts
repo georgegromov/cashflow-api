@@ -8,6 +8,7 @@ export interface ITransactionEntity {
   id: string;
   amount: number;
   type: TransactionType;
+  note?: string;
   user: User;
   category: Category | null;
   created_at: Date;
@@ -16,6 +17,7 @@ export interface ITransactionEntity {
 export interface ICreateTransactionDto {
   type: TransactionType;
   amount: number;
+  note?: string;
   categoryId?: string;
 }
 

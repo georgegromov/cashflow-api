@@ -5,4 +5,6 @@ import { ICreateCategoryDto } from '../interfaces/categories.interface';
 export class CreateCategoryDto implements ICreateCategoryDto {
   @ApiProperty()
   readonly name: string;
+  @ApiProperty({ enum: ['income', 'expense'] })
+  readonly type: 'income' | 'expense';
 }

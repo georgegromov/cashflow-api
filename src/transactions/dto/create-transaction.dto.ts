@@ -18,6 +18,12 @@ export class CreateTransactionDto implements ICreateTransactionDto {
     required: true,
   })
   amount: number;
+  @ApiProperty({
+    example: 'Какой-то текст...',
+    description: 'Заметка к транзакции',
+    required: false,
+  })
+  note?: string;
   @ApiPropertyOptional({
     example: 'a3b6a7f1-9d88-4db4-9d3a-25e0e6f6e2bd',
     description: 'Уникальный идентификатор выбранной категории.',

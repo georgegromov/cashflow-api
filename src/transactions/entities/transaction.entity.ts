@@ -24,6 +24,9 @@ export class Transaction implements ITransactionEntity {
   })
   type: 'income' | 'expense';
 
+  @Column('text', { nullable: true })
+  note: string;
+
   @ManyToOne(() => User, (u) => u.transactions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;

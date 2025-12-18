@@ -44,6 +44,7 @@ export class TransactionsService {
     const transaction = this.transactionsRepository.create({
       amount: createTransactionDto.amount,
       type: createTransactionDto.type,
+      note: createTransactionDto.note,
       user: { id: userId },
       category,
     });
