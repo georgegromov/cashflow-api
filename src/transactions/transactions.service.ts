@@ -19,6 +19,7 @@ import {
   FinancialAnalyticsDto,
   CategoryAnalyticsDto,
 } from './dto/analytics-response.dto';
+import { TransactionSubject } from 'src/common/observers/transaction.observer';
 
 @Injectable()
 export class TransactionsService {
@@ -30,6 +31,8 @@ export class TransactionsService {
 
     @InjectRepository(Category)
     private readonly categoriesRepository: Repository<Category>,
+
+    private readonly transactionSubject: TransactionSubject,
   ) {}
 
   async create(userId: string, createTransactionDto: ICreateTransactionDto) {
@@ -60,6 +63,10 @@ export class TransactionsService {
     });
 
     const created = await this.transactionsRepository.save(transaction);
+
+    // Уведомляем наблюдателей о создании транзакции (Observer Pattern)
+    await this.transactionSubject.notifyTransactionCreated(created);
+
     return created.id;
   }
 

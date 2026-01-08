@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { ICategoryService } from './interfaces/categories.interface';
+import { CategoryRepository } from 'src/common/repositories/category.repository';
 
 @Injectable()
 export class CategoriesService implements ICategoryService {
@@ -13,6 +14,8 @@ export class CategoriesService implements ICategoryService {
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
+    // Использование паттерна Repository Pattern
+    private readonly categoryRepository: CategoryRepository,
   ) {}
 
   async create(userId: string, createCategoryDto: CreateCategoryDto) {
@@ -27,15 +30,16 @@ export class CategoriesService implements ICategoryService {
   }
 
   async findAll(userId: string) {
-    return await this.categoriesRepository.find({
-      where: { user: { id: userId } },
-    });
+    // Использование паттерна Repository Pattern
+    return await this.categoryRepository.findByUserId(userId);
   }
 
   async findOne(id: string, userId: string) {
-    const category = await this.categoriesRepository.findOne({
-      where: { id, user: { id: userId } },
-    });
+    // Использование паттерна Repository Pattern
+    const category = await this.categoryRepository.findByIdAndUserId(
+      id,
+      userId,
+    );
 
     if (!category) {
       throw new NotFoundException(`category with id:${id} is not found`);
