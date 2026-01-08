@@ -28,6 +28,16 @@ export interface ITransactionService {
   ): Promise<string>;
   findAll(userId: string): Promise<ITransactionEntity[]>;
   findOne(id: string, userId: string): Promise<ITransactionEntity>;
+  getFinancialAnalytics(
+    userId: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<any>;
+  getCategoryAnalytics(
+    userId: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<any>;
 }
 
 export interface ITransactionController {
@@ -37,4 +47,12 @@ export interface ITransactionController {
   ): Promise<string>;
   findAll(curretUser: JwtPayload): Promise<ITransactionEntity[]>;
   findOne(id: string, curretUser: JwtPayload): Promise<ITransactionEntity>;
+  getFinancialAnalytics(
+    curretUser: JwtPayload,
+    query: { startDate?: string; endDate?: string },
+  ): Promise<any>;
+  getCategoryAnalytics(
+    curretUser: JwtPayload,
+    query: { startDate?: string; endDate?: string },
+  ): Promise<any>;
 }
