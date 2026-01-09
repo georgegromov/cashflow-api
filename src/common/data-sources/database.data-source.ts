@@ -54,10 +54,7 @@ export class DatabaseDataSource implements IDataSource {
     });
   }
 
-  async getCategoryById(
-    id: string,
-    userId: string,
-  ): Promise<Category | null> {
+  async getCategoryById(id: string, userId: string): Promise<Category | null> {
     return this.categoriesRepository.findOne({
       where: { id, user: { id: userId } } as FindOptionsWhere<Category>,
     });

@@ -1,0 +1,159 @@
+@startuml Иерархия классов паттернов проектирования
+
+!theme plain
+skinparam classAttributeIconSize 0
+
+' Абстрактные классы и интерфейсы
+abstract class AbstractRepository<T> {
+  + {abstract} findAll(): Promise<T[]>
+  + {abstract} findById(id: string): Promise<T | null>
+  + {abstract} create(entity: Partial<T>): Promise<T>
+  + {abstract} update(id: string, entity: Partial<T>): Promise<T>
+  + {abstract} delete(id: string): Promise<boolean>
+  + {abstract} findBy(condition: Partial<T>): Promise<T[]>
+}
+note right of AbstractRepository
+  Repository Pattern
+  Базовый класс для работы с данными
+end note
+
+abstract class AbstractTransactionObserver {
+  + onTransactionCreated(transaction: Transaction): Promise<void> | void
+  + onTransactionUpdated(transaction: Transaction): Promise<void> | void
+  + onTransactionDeleted(transactionId: string): Promise<void> | void
+}
+note right of AbstractTransactionObserver
+  Observer Pattern
+  Базовый класс наблюдателя
+end note
+
+interface ITransactionObserver {
+  + onTransactionCreated(transaction: Transaction): Promise<void> | void
+  + onTransactionUpdated(transaction: Transaction): Promise<void> | void
+  + onTransactionDeleted(transactionId: string): Promise<void> | void
+}
+note right of ITransactionObserver
+  Observer Pattern
+  Интерфейс наблюдателя
+end note
+
+interface IDataSource {
+  + getTransactions(userId: string): Promise<Transaction[]>
+  + getTransactionById(id: string, userId: string): Promise<Transaction | null>
+  + createTransaction(userId: string, transaction: Partial<Transaction>): Promise<Transaction>
+  + getCategories(userId: string): Promise<Category[]>
+  + getCategoryById(id: string, userId: string): Promise<Category | null>
+  + createCategory(userId: string, category: Partial<Category>): Promise<Category>
+  + updateCategory(id: string, userId: string, category: Partial<Category>): Promise<Category>
+  + deleteCategory(id: string, userId: string): Promise<boolean>
+  + getUserById(id: string): Promise<User | null>
+  + getUserByUsername(username: string): Promise<User | null>
+  + createUser(user: Partial<User>): Promise<User>
+}
+note right of IDataSource
+  Strategy Pattern
+  Интерфейс источника данных
+end note
+
+abstract class DataSourceFactory {
+  + {abstract} createDataSource(): IDataSource
+}
+note right of DataSourceFactory
+  Abstract Factory Pattern
+  Абстрактная фабрика
+end note
+
+' Конкретные реализации
+class TransactionRepository extends AbstractRepository<Transaction> {
+  - repository: Repository<Transaction>
+  + findAll(): Promise<Transaction[]>
+  + findById(id: string): Promise<Transaction | null>
+  + create(entity: Partial<Transaction>): Promise<Transaction>
+  + update(id: string, entity: Partial<Transaction>): Promise<Transaction>
+  + delete(id: string): Promise<boolean>
+  + findBy(condition: Partial<Transaction>): Promise<Transaction[]>
+  + findByUserId(userId: string): Promise<Transaction[]>
+  + findByIdAndUserId(id: string, userId: string): Promise<Transaction | null>
+}
+
+class CategoryRepository extends AbstractRepository<Category> {
+  - repository: Repository<Category>
+  + findAll(): Promise<Category[]>
+  + findById(id: string): Promise<Category | null>
+  + create(entity: Partial<Category>): Promise<Category>
+  + update(id: string, entity: Partial<Category>): Promise<Category>
+  + delete(id: string): Promise<boolean>
+  + findBy(condition: Partial<Category>): Promise<Category[]>
+  + findByUserId(userId: string): Promise<Category[]>
+  + findByIdAndUserId(id: string, userId: string): Promise<Category | null>
+}
+
+class AnalyticsObserver extends AbstractTransactionObserver {
+  - logger: Logger
+  + onTransactionCreated(transaction: Transaction): void
+  + onTransactionUpdated(transaction: Transaction): void
+  + onTransactionDeleted(transactionId: string): void
+}
+
+class DatabaseDataSource implements IDataSource {
+  - transactionsRepository: Repository<Transaction>
+  - categoriesRepository: Repository<Category>
+  - usersRepository: Repository<User>
+  + getTransactions(userId: string): Promise<Transaction[]>
+  + getTransactionById(id: string, userId: string): Promise<Transaction | null>
+  + createTransaction(userId: string, transaction: Partial<Transaction>): Promise<Transaction>
+  + getCategories(userId: string): Promise<Category[]>
+  + getCategoryById(id: string, userId: string): Promise<Category | null>
+  + createCategory(userId: string, category: Partial<Category>): Promise<Category>
+  + updateCategory(id: string, userId: string, category: Partial<Category>): Promise<Category>
+  + deleteCategory(id: string, userId: string): Promise<boolean>
+  + getUserById(id: string): Promise<User | null>
+  + getUserByUsername(username: string): Promise<User | null>
+  + createUser(user: Partial<User>): Promise<User>
+}
+note right of DatabaseDataSource
+  Strategy Pattern
+  Реализация для PostgreSQL
+end note
+
+class MockDataSource implements IDataSource {
+  - transactions: Map<string, Transaction>
+  - categories: Map<string, Category>
+  - users: Map<string, User>
+  - transactionCounter: number
+  - categoryCounter: number
+  - userCounter: number
+  + getTransactions(userId: string): Promise<Transaction[]>
+  + getTransactionById(id: string, userId: string): Promise<Transaction | null>
+  + createTransaction(userId: string, transaction: Partial<Transaction>): Promise<Transaction>
+  + getCategories(userId: string): Promise<Category[]>
+  + getCategoryById(id: string, userId: string): Promise<Category | null>
+  + createCategory(userId: string, category: Partial<Category>): Promise<Category>
+  + updateCategory(id: string, userId: string, category: Partial<Category>): Promise<Category>
+  + deleteCategory(id: string, userId: string): Promise<boolean>
+  + getUserById(id: string): Promise<User | null>
+  + getUserByUsername(username: string): Promise<User | null>
+  + createUser(user: Partial<User>): Promise<User>
+  + clear(): void
+}
+note right of MockDataSource
+  Strategy Pattern
+  Реализация для тестирования
+end note
+
+class DataSourceFactoryImpl extends DataSourceFactory {
+  - configService: ConfigService
+  - databaseDataSource: DatabaseDataSource
+  - mockDataSource: MockDataSource
+  + createDataSource(): IDataSource
+  + createDataSourceByType(type: DataSourceType): IDataSource
+}
+note right of DataSourceFactoryImpl
+  Abstract Factory Pattern
+  Конкретная реализация фабрики
+end note
+
+' Связи наследования
+AbstractTransactionObserver ..|> ITransactionObserver : implements
+
+@enduml

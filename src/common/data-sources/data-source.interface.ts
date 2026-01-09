@@ -39,7 +39,10 @@ export interface IDataSource {
   /**
    * Создать категорию
    */
-  createCategory(userId: string, category: Partial<Category>): Promise<Category>;
+  createCategory(
+    userId: string,
+    category: Partial<Category>,
+  ): Promise<Category>;
 
   /**
    * Обновить категорию

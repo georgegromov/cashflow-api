@@ -1,0 +1,140 @@
+@startuml Реализация источника данных (Strategy + Abstract Factory)
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Strategy Pattern" {
+  interface IDataSource {
+    + getTransactions(userId: string): Promise<Transaction[]>
+    + getTransactionById(id: string, userId: string): Promise<Transaction | null>
+    + createTransaction(userId: string, transaction: Partial<Transaction>): Promise<Transaction>
+    + getCategories(userId: string): Promise<Category[]>
+    + getCategoryById(id: string, userId: string): Promise<Category | null>
+    + createCategory(userId: string, category: Partial<Category>): Promise<Category>
+    + updateCategory(id: string, userId: string, category: Partial<Category>): Promise<Category>
+    + deleteCategory(id: string, userId: string): Promise<boolean>
+    + getUserById(id: string): Promise<User | null>
+    + getUserByUsername(username: string): Promise<User | null>
+    + createUser(user: Partial<User>): Promise<User>
+  }
+  
+  note right of IDataSource
+    **Strategy Pattern**
+    Интерфейс определяет алгоритм
+    работы с данными
+  end note
+  
+  class DatabaseDataSource implements IDataSource {
+    - transactionsRepository: Repository<Transaction>
+    - categoriesRepository: Repository<Category>
+    - usersRepository: Repository<User>
+    --
+    + getTransactions(userId: string): Promise<Transaction[]>
+    + getTransactionById(id: string, userId: string): Promise<Transaction | null>
+    + createTransaction(userId: string, transaction: Partial<Transaction>): Promise<Transaction>
+    + getCategories(userId: string): Promise<Category[]>
+    + getCategoryById(id: string, userId: string): Promise<Category | null>
+    + createCategory(userId: string, category: Partial<Category>): Promise<Category>
+    + updateCategory(id: string, userId: string, category: Partial<Category>): Promise<Category>
+    + deleteCategory(id: string, userId: string): Promise<boolean>
+    + getUserById(id: string): Promise<User | null>
+    + getUserByUsername(username: string): Promise<User | null>
+    + createUser(user: Partial<User>): Promise<User>
+  }
+  
+  note right of DatabaseDataSource
+    **Конкретная стратегия**
+    Реализация для PostgreSQL
+    через TypeORM
+  end note
+  
+  class MockDataSource implements IDataSource {
+    - transactions: Map<string, Transaction>
+    - categories: Map<string, Category>
+    - users: Map<string, User>
+    - transactionCounter: number
+    - categoryCounter: number
+    - userCounter: number
+    --
+    + getTransactions(userId: string): Promise<Transaction[]>
+    + getTransactionById(id: string, userId: string): Promise<Transaction | null>
+    + createTransaction(userId: string, transaction: Partial<Transaction>): Promise<Transaction>
+    + getCategories(userId: string): Promise<Category[]>
+    + getCategoryById(id: string, userId: string): Promise<Category | null>
+    + createCategory(userId: string, category: Partial<Category>): Promise<Category>
+    + updateCategory(id: string, userId: string, category: Partial<Category>): Promise<Category>
+    + deleteCategory(id: string, userId: string): Promise<boolean>
+    + getUserById(id: string): Promise<User | null>
+    + getUserByUsername(username: string): Promise<User | null>
+    + createUser(user: Partial<User>): Promise<User>
+    + clear(): void
+  }
+  
+  note right of MockDataSource
+    **Конкретная стратегия**
+    Реализация для тестирования
+    Хранит данные в памяти
+  end note
+}
+
+package "Abstract Factory Pattern" {
+  abstract class DataSourceFactory {
+    + {abstract} createDataSource(): IDataSource
+  }
+  
+  note right of DataSourceFactory
+    **Abstract Factory**
+    Абстрактная фабрика для создания
+    источников данных
+  end note
+  
+  class DataSourceFactoryImpl extends DataSourceFactory {
+    - configService: ConfigService
+    - databaseDataSource: DatabaseDataSource
+    - mockDataSource: MockDataSource
+    --
+    + createDataSource(): IDataSource
+    + createDataSourceByType(type: DataSourceType): IDataSource
+  }
+  
+  note right of DataSourceFactoryImpl
+    **Конкретная фабрика**
+    Создает источники данных
+    на основе конфигурации
+  end note
+  
+  enum DataSourceType {
+    DATABASE
+    MOCK
+  }
+}
+
+' Связи
+DataSourceFactoryImpl ..> DatabaseDataSource : creates
+DataSourceFactoryImpl ..> MockDataSource : creates
+DataSourceFactoryImpl ..> DataSourceType : uses
+DataSourceFactoryImpl ..> ConfigService : uses
+
+DatabaseDataSource ..> Repository<Transaction> : uses
+DatabaseDataSource ..> Repository<Category> : uses
+DatabaseDataSource ..> Repository<User> : uses
+
+MockDataSource ..> Map : uses
+
+' Пример использования
+class Client {
+  - dataSourceFactory: DataSourceFactoryImpl
+  --
+  + useDataSource()
+}
+
+Client ..> DataSourceFactoryImpl : uses
+Client ..> IDataSource : uses
+
+note top of Client
+  Клиент использует фабрику для получения
+  источника данных и работает через интерфейс
+end note
+
+@enduml

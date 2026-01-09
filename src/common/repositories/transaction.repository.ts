@@ -35,10 +35,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
     return this.repository.save(transaction);
   }
 
-  async update(
-    id: string,
-    entity: Partial<Transaction>,
-  ): Promise<Transaction> {
+  async update(id: string, entity: Partial<Transaction>): Promise<Transaction> {
     await this.repository.update(id, entity);
     const updated = await this.findById(id);
     if (!updated) {

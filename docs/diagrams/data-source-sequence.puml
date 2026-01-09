@@ -1,0 +1,48 @@
+@startuml Последовательность создания источника данных
+
+!theme plain
+
+actor Client
+participant "DataSourceFactoryImpl" as Factory
+participant "ConfigService" as Config
+participant "DatabaseDataSource" as DB
+participant "MockDataSource" as Mock
+participant "IDataSource" as Interface
+
+Client -> Factory: createDataSource()
+activate Factory
+
+Factory -> Config: get('DATA_SOURCE_TYPE')
+activate Config
+Config --> Factory: 'database' или 'mock'
+deactivate Config
+
+alt DATA_SOURCE_TYPE == 'database'
+  Factory -> DB: return databaseDataSource
+  activate DB
+  DB --> Factory: IDataSource (DatabaseDataSource)
+  deactivate DB
+  Factory --> Client: IDataSource (DatabaseDataSource)
+else DATA_SOURCE_TYPE == 'mock'
+  Factory -> Mock: return mockDataSource
+  activate Mock
+  Mock --> Factory: IDataSource (MockDataSource)
+  deactivate Mock
+  Factory --> Client: IDataSource (MockDataSource)
+end
+
+deactivate Factory
+
+note right of Factory
+  **Abstract Factory Pattern**
+  Фабрика выбирает стратегию
+  на основе конфигурации
+end note
+
+note right of Interface
+  **Strategy Pattern**
+  Клиент работает через интерфейс,
+  не зная конкретной реализации
+end note
+
+@enduml

@@ -29,15 +29,15 @@ export abstract class AbstractTransactionObserver
   implements ITransactionObserver
 {
   onTransactionCreated(transaction: Transaction): Promise<void> | void {
-    // Базовая реализация (пустая)
+    void transaction; // базовая реализация (пустая)
   }
 
   onTransactionUpdated(transaction: Transaction): Promise<void> | void {
-    // Базовая реализация (пустая)
+    void transaction; // базовая реализация (пустая)
   }
 
   onTransactionDeleted(transactionId: string): Promise<void> | void {
-    // Базовая реализация (пустая)
+    void transactionId; // базовая реализация (пустая)
   }
 }
 
@@ -69,32 +69,29 @@ export class TransactionSubject {
    * Уведомить всех наблюдателей о создании транзакции
    */
   async notifyTransactionCreated(transaction: Transaction): Promise<void> {
-    await Promise.all(
-      this.observers.map((observer) =>
-        observer.onTransactionCreated(transaction),
-      ),
+    const tasks = this.observers.map((observer) =>
+      Promise.resolve(observer.onTransactionCreated(transaction)),
     );
+    await Promise.all(tasks);
   }
 
   /**
    * Уведомить всех наблюдателей об обновлении транзакции
    */
   async notifyTransactionUpdated(transaction: Transaction): Promise<void> {
-    await Promise.all(
-      this.observers.map((observer) =>
-        observer.onTransactionUpdated(transaction),
-      ),
+    const tasks = this.observers.map((observer) =>
+      Promise.resolve(observer.onTransactionUpdated(transaction)),
     );
+    await Promise.all(tasks);
   }
 
   /**
    * Уведомить всех наблюдателей об удалении транзакции
    */
   async notifyTransactionDeleted(transactionId: string): Promise<void> {
-    await Promise.all(
-      this.observers.map((observer) =>
-        observer.onTransactionDeleted(transactionId),
-      ),
+    const tasks = this.observers.map((observer) =>
+      Promise.resolve(observer.onTransactionDeleted(transactionId)),
     );
+    await Promise.all(tasks);
   }
 }

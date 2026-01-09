@@ -1,0 +1,120 @@
+@startuml Базовая иерархия классов - Модель предметной области
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+
+' Сущности предметной области
+class User {
+  - id: string
+  - username: string
+  - password_hash: string
+  - created_at: Date
+  --
+  + transactions: Transaction[]
+  + categories: Category[]
+}
+note right of User
+  **Пользователь**
+  Основная сущность системы
+  Содержит транзакции и категории
+end note
+
+class Transaction {
+  - id: string
+  - amount: number
+  - type: 'income' | 'expense'
+  - note: string
+  - created_at: Date
+  --
+  + user: User
+  + category: Category | null
+}
+note right of Transaction
+  **Транзакция**
+  Доход или расход пользователя
+  Может быть связана с категорией
+end note
+
+class Category {
+  - id: string
+  - name: string
+  - type: 'income' | 'expense'
+  - created_at: Date
+  --
+  + user: User
+}
+note right of Category
+  **Категория**
+  Группировка транзакций
+  Принадлежит пользователю
+end note
+
+' Связи между сущностями
+User "1" *-- "many" Transaction : имеет
+User "1" *-- "many" Category : имеет
+Transaction "many" --> "0..1" Category : относится к
+
+' Детализация связей
+note right of User
+  Один пользователь может иметь
+  множество транзакций и категорий
+end note
+
+note right of Transaction
+  Транзакция принадлежит одному пользователю
+  и может быть связана с одной категорией
+  (или не иметь категории)
+end note
+
+note right of Category
+  Категория принадлежит одному пользователю
+  и может использоваться в множестве транзакций
+end note
+
+' Типы транзакций
+enum TransactionType {
+  income
+  expense
+}
+
+' Типы категорий
+enum CategoryType {
+  income
+  expense
+}
+
+Transaction ..> TransactionType : использует
+Category ..> CategoryType : использует
+
+' Дополнительная информация о модели
+legend right
+  |<#LightBlue> **Модель предметной области** |
+  |
+  **User (Пользователь)**
+  - Уникальный идентификатор
+  - Имя пользователя
+  - Хеш пароля
+  - Дата создания
+  |
+  **Transaction (Транзакция)**
+  - Уникальный идентификатор
+  - Сумма
+  - Тип (доход/расход)
+  - Примечание
+  - Дата создания
+  |
+  **Category (Категория)**
+  - Уникальный идентификатор
+  - Название
+  - Тип (доход/расход)
+  - Дата создания
+  |
+  **Связи:**
+  - User 1:N Transaction
+  - User 1:N Category
+  - Transaction N:0..1 Category
+endlegend
+
+@enduml

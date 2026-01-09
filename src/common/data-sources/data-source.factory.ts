@@ -39,9 +39,10 @@ export class DataSourceFactoryImpl extends DataSourceFactory {
   }
 
   createDataSource(): IDataSource {
-    const dataSourceType =
-      this.configService.get<string>('DATA_SOURCE_TYPE', 'database') ||
-      'database';
+    const dataSourceType = (this.configService.get<string>(
+      'DATA_SOURCE_TYPE',
+      'database',
+    ) || 'database') as DataSourceType;
 
     switch (dataSourceType) {
       case DataSourceType.MOCK:
