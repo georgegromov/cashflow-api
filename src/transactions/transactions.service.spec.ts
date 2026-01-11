@@ -1,16 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TransactionsService } from './transactions.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Transaction } from './entities/transaction.entity';
-import { Category } from 'src/categories/entities/category.entity';
-import { Repository } from 'typeorm';
-import { MockDataSource } from 'src/common/data-sources/mock.data-source';
-import { DataSourceFactoryImpl, DataSourceType } from 'src/common/data-sources/data-source.factory';
-import { TransactionSubject } from 'src/common/observers/transaction.observer';
-import { AnalyticsObserver } from 'src/common/observers/analytics.observer';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { TransactionsService } from "./transactions.service";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { Transaction } from "./entities/transaction.entity";
+import { Category } from "src/categories/entities/category.entity";
+import { Repository } from "typeorm";
+import { MockDataSource } from "src/common/data-sources/mock.data-source";
+import {
+  DataSourceFactoryImpl,
+  DataSourceType,
+} from "src/common/data-sources/data-source.factory";
+import { TransactionSubject } from "src/common/observers/transaction.observer";
+import { AnalyticsObserver } from "src/common/observers/analytics.observer";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 
-describe('TransactionsService', () => {
+describe("TransactionsService", () => {
   let service: TransactionsService;
   let mockDataSource: MockDataSource;
   let transactionSubject: TransactionSubject;
@@ -62,30 +65,30 @@ describe('TransactionsService', () => {
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('должен создать транзакцию с категорией', async () => {
-      const userId = 'user-1';
-      const categoryId = 'category-1';
+  describe("create", () => {
+    it("должен создать транзакцию с категорией", async () => {
+      const userId = "user-1";
+      const categoryId = "category-1";
       const createDto = {
         amount: 100,
-        type: 'expense' as const,
-        note: 'Test transaction',
+        type: "expense" as const,
+        note: "Test transaction",
         categoryId,
       };
 
       const mockCategory: Category = {
         id: categoryId,
-        name: 'Food',
-        type: 'expense',
+        name: "Food",
+        type: "expense",
         user: { id: userId } as any,
         created_at: new Date(),
       } as Category;
 
       const mockTransaction: Transaction = {
-        id: 'transaction-1',
+        id: "transaction-1",
         amount: 100,
-        type: 'expense',
-        note: 'Test transaction',
+        type: "expense",
+        note: "Test transaction",
         category: mockCategory,
         user: { id: userId } as any,
         created_at: new Date(),
@@ -108,19 +111,19 @@ describe('TransactionsService', () => {
       expect(mockTransactionRepository.save).toHaveBeenCalled();
     });
 
-    it('должен создать транзакцию без категории', async () => {
-      const userId = 'user-1';
+    it("должен создать транзакцию без категории", async () => {
+      const userId = "user-1";
       const createDto = {
         amount: 100,
-        type: 'income' as const,
-        note: 'Test transaction',
+        type: "income" as const,
+        note: "Test transaction",
       };
 
       const mockTransaction: Transaction = {
-        id: 'transaction-1',
+        id: "transaction-1",
         amount: 100,
-        type: 'income',
-        note: 'Test transaction',
+        type: "income",
+        note: "Test transaction",
         category: null,
         user: { id: userId } as any,
         created_at: new Date(),
@@ -137,12 +140,12 @@ describe('TransactionsService', () => {
       expect(mockTransactionRepository.save).toHaveBeenCalled();
     });
 
-    it('должен выбросить ошибку, если категория не найдена', async () => {
-      const userId = 'user-1';
-      const categoryId = 'non-existent-category';
+    it("должен выбросить ошибку, если категория не найдена", async () => {
+      const userId = "user-1";
+      const categoryId = "non-existent-category";
       const createDto = {
         amount: 100,
-        type: 'expense' as const,
+        type: "expense" as const,
         categoryId,
       };
 
@@ -154,21 +157,21 @@ describe('TransactionsService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('должен вернуть все транзакции пользователя', async () => {
-      const userId = 'user-1';
+  describe("findAll", () => {
+    it("должен вернуть все транзакции пользователя", async () => {
+      const userId = "user-1";
       const mockTransactions: Transaction[] = [
         {
-          id: 'transaction-1',
+          id: "transaction-1",
           amount: 100,
-          type: 'expense',
+          type: "expense",
           user: { id: userId } as any,
           created_at: new Date(),
         } as Transaction,
         {
-          id: 'transaction-2',
+          id: "transaction-2",
           amount: 200,
-          type: 'income',
+          type: "income",
           user: { id: userId } as any,
           created_at: new Date(),
         } as Transaction,
@@ -181,19 +184,19 @@ describe('TransactionsService', () => {
       expect(result).toEqual(mockTransactions);
       expect(mockTransactionRepository.find).toHaveBeenCalledWith({
         where: { user: { id: userId } },
-        order: { created_at: 'DESC' },
+        order: { created_at: "DESC" },
       });
     });
   });
 
-  describe('findOne', () => {
-    it('должен вернуть транзакцию по ID', async () => {
-      const userId = 'user-1';
-      const transactionId = 'transaction-1';
+  describe("findOne", () => {
+    it("должен вернуть транзакцию по ID", async () => {
+      const userId = "user-1";
+      const transactionId = "transaction-1";
       const mockTransaction: Transaction = {
         id: transactionId,
         amount: 100,
-        type: 'expense',
+        type: "expense",
         user: { id: userId } as any,
         created_at: new Date(),
       } as Transaction;
@@ -208,9 +211,9 @@ describe('TransactionsService', () => {
       });
     });
 
-    it('должен выбросить ошибку, если транзакция не найдена', async () => {
-      const userId = 'user-1';
-      const transactionId = 'non-existent-transaction';
+    it("должен выбросить ошибку, если транзакция не найдена", async () => {
+      const userId = "user-1";
+      const transactionId = "non-existent-transaction";
 
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
@@ -220,22 +223,22 @@ describe('TransactionsService', () => {
     });
   });
 
-  describe('getFinancialAnalytics', () => {
-    it('должен вернуть финансовую аналитику', async () => {
-      const userId = 'user-1';
+  describe("getFinancialAnalytics", () => {
+    it("должен вернуть финансовую аналитику", async () => {
+      const userId = "user-1";
       const mockTransactions: Transaction[] = [
         {
-          id: 'transaction-1',
+          id: "transaction-1",
           amount: 100,
-          type: 'income',
+          type: "income",
           user: { id: userId } as any,
           category: null,
           created_at: new Date(),
         } as Transaction,
         {
-          id: 'transaction-2',
+          id: "transaction-2",
           amount: 50,
-          type: 'expense',
+          type: "expense",
           user: { id: userId } as any,
           category: null,
           created_at: new Date(),
@@ -254,9 +257,9 @@ describe('TransactionsService', () => {
       expect(result.totalTransactions).toBe(2);
     });
 
-    it('должен выбросить ошибку при невалидной дате', async () => {
-      const userId = 'user-1';
-      const invalidDate = 'invalid-date';
+    it("должен выбросить ошибку при невалидной дате", async () => {
+      const userId = "user-1";
+      const invalidDate = "invalid-date";
 
       await expect(
         service.getFinancialAnalytics(userId, invalidDate),

@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
-import { Transaction } from 'src/transactions/entities/transaction.entity';
-import { Category } from 'src/categories/entities/category.entity';
-import { User } from 'src/users/entities/user.entity';
-import { IDataSource } from './data-source.interface';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, FindOptionsWhere } from "typeorm";
+import { Transaction } from "src/transactions/entities/transaction.entity";
+import { Category } from "src/categories/entities/category.entity";
+import { User } from "src/users/entities/user.entity";
+import { IDataSource } from "./data-source.interface";
 
 /**
  * Реализация источника данных для базы данных PostgreSQL
@@ -24,7 +24,7 @@ export class DatabaseDataSource implements IDataSource {
   async getTransactions(userId: string): Promise<Transaction[]> {
     return this.transactionsRepository.find({
       where: { user: { id: userId } } as FindOptionsWhere<Transaction>,
-      order: { created_at: 'DESC' },
+      order: { created_at: "DESC" },
     });
   }
 
@@ -78,7 +78,7 @@ export class DatabaseDataSource implements IDataSource {
   ): Promise<Category> {
     const existingCategory = await this.getCategoryById(id, userId);
     if (!existingCategory) {
-      throw new Error('Category not found');
+      throw new Error("Category not found");
     }
     Object.assign(existingCategory, category);
     return this.categoriesRepository.save(existingCategory);

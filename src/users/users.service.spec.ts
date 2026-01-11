@@ -1,13 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository, DataSource } from 'typeorm';
-import { MockDataSource } from 'src/common/data-sources/mock.data-source';
-import { Category } from 'src/categories/entities/category.entity';
-import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { UsersService } from "./users.service";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { User } from "./entities/user.entity";
+import { DataSource } from "typeorm";
+import { MockDataSource } from "src/common/data-sources/mock.data-source";
+import { NotFoundException } from "@nestjs/common";
 
-describe('UsersService', () => {
+describe("UsersService", () => {
   let service: UsersService;
   let mockDataSource: MockDataSource;
 
@@ -63,17 +62,17 @@ describe('UsersService', () => {
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('должен создать пользователя с категориями по умолчанию', async () => {
+  describe("create", () => {
+    it("должен создать пользователя с категориями по умолчанию", async () => {
       const createDto = {
-        username: 'testuser',
-        password: 'hashedpassword',
+        username: "testuser",
+        password: "hashedpassword",
       };
 
       const mockUser: User = {
-        id: 'user-1',
-        username: 'testuser',
-        password_hash: 'hashedpassword',
+        id: "user-1",
+        username: "testuser",
+        password_hash: "hashedpassword",
         created_at: new Date(),
       } as User;
 
@@ -94,14 +93,14 @@ describe('UsersService', () => {
       expect(queryRunner.release).toHaveBeenCalled();
     });
 
-    it('должен откатить транзакцию при ошибке', async () => {
+    it("должен откатить транзакцию при ошибке", async () => {
       const createDto = {
-        username: 'testuser',
-        password: 'hashedpassword',
+        username: "testuser",
+        password: "hashedpassword",
       };
 
       const queryRunner = mockDataSourceInstance.createQueryRunner();
-      queryRunner.manager.save.mockRejectedValue(new Error('Database error'));
+      queryRunner.manager.save.mockRejectedValue(new Error("Database error"));
 
       await expect(service.create(createDto)).rejects.toThrow();
 
@@ -110,19 +109,19 @@ describe('UsersService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('должен вернуть всех пользователей', async () => {
+  describe("findAll", () => {
+    it("должен вернуть всех пользователей", async () => {
       const mockUsers: User[] = [
         {
-          id: 'user-1',
-          username: 'user1',
-          password_hash: 'hash1',
+          id: "user-1",
+          username: "user1",
+          password_hash: "hash1",
           created_at: new Date(),
         } as User,
         {
-          id: 'user-2',
-          username: 'user2',
-          password_hash: 'hash2',
+          id: "user-2",
+          username: "user2",
+          password_hash: "hash2",
           created_at: new Date(),
         } as User,
       ];
@@ -136,13 +135,13 @@ describe('UsersService', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('должен вернуть пользователя по ID', async () => {
-      const userId = 'user-1';
+  describe("findOne", () => {
+    it("должен вернуть пользователя по ID", async () => {
+      const userId = "user-1";
       const mockUser: User = {
         id: userId,
-        username: 'testuser',
-        password_hash: 'hash',
+        username: "testuser",
+        password_hash: "hash",
         created_at: new Date(),
       } as User;
 
@@ -157,12 +156,12 @@ describe('UsersService', () => {
       });
     });
 
-    it('должен вернуть пользователя по username', async () => {
-      const username = 'testuser';
+    it("должен вернуть пользователя по username", async () => {
+      const username = "testuser";
       const mockUser: User = {
-        id: 'user-1',
+        id: "user-1",
         username,
-        password_hash: 'hash',
+        password_hash: "hash",
         created_at: new Date(),
       } as User;
 
@@ -177,32 +176,32 @@ describe('UsersService', () => {
       });
     });
 
-    it('должен вернуть null, если пользователь не найден', async () => {
+    it("должен вернуть null, если пользователь не найден", async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      const result = await service.findOne({ userId: 'non-existent' });
+      const result = await service.findOne({ userId: "non-existent" });
 
       expect(result).toBeNull();
     });
   });
 
-  describe('update', () => {
-    it('должен обновить пользователя', async () => {
-      const userId = 'user-1';
+  describe("update", () => {
+    it("должен обновить пользователя", async () => {
+      const userId = "user-1";
       const updateDto = {
-        username: 'newusername',
+        username: "newusername",
       };
 
       const existingUser: User = {
         id: userId,
-        username: 'oldusername',
-        password_hash: 'hash',
+        username: "oldusername",
+        password_hash: "hash",
         created_at: new Date(),
       } as User;
 
       const updatedUser: User = {
         ...existingUser,
-        username: 'newusername',
+        username: "newusername",
       } as User;
 
       mockUserRepository.preload.mockResolvedValue(updatedUser);
@@ -215,10 +214,10 @@ describe('UsersService', () => {
       expect(mockUserRepository.save).toHaveBeenCalled();
     });
 
-    it('должен выбросить ошибку, если пользователь не найден', async () => {
-      const userId = 'non-existent';
+    it("должен выбросить ошибку, если пользователь не найден", async () => {
+      const userId = "non-existent";
       const updateDto = {
-        username: 'newusername',
+        username: "newusername",
       };
 
       mockUserRepository.preload.mockResolvedValue(null);
@@ -229,9 +228,9 @@ describe('UsersService', () => {
     });
   });
 
-  describe('delete', () => {
-    it('должен удалить пользователя', async () => {
-      const userId = 'user-1';
+  describe("delete", () => {
+    it("должен удалить пользователя", async () => {
+      const userId = "user-1";
 
       mockUserRepository.delete.mockResolvedValue({ affected: 1 });
 

@@ -1,4 +1,4 @@
-import { Transaction } from 'src/transactions/entities/transaction.entity';
+import { Transaction } from "src/transactions/entities/transaction.entity";
 
 /**
  * Интерфейс наблюдателя для событий транзакций
@@ -28,17 +28,11 @@ export interface ITransactionObserver {
 export abstract class AbstractTransactionObserver
   implements ITransactionObserver
 {
-  onTransactionCreated(transaction: Transaction): Promise<void> | void {
-    void transaction; // базовая реализация (пустая)
-  }
+  abstract onTransactionCreated(transaction: Transaction): Promise<void> | void;
 
-  onTransactionUpdated(transaction: Transaction): Promise<void> | void {
-    void transaction; // базовая реализация (пустая)
-  }
+  abstract onTransactionUpdated(transaction: Transaction): Promise<void> | void;
 
-  onTransactionDeleted(transactionId: string): Promise<void> | void {
-    void transactionId; // базовая реализация (пустая)
-  }
+  abstract onTransactionDeleted(transactionId: string): Promise<void> | void;
 }
 
 /**

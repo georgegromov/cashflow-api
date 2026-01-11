@@ -1,4 +1,4 @@
-interface IAbstractRepository<T> {
+export interface IAbstractRepository<T> {
   /**
    * Найти все записи
    */

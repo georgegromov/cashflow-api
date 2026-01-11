@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriesService } from './categories.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
-import { MockDataSource } from 'src/common/data-sources/mock.data-source';
-import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { CategoriesService } from "./categories.service";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { Category } from "./entities/category.entity";
+import { Repository } from "typeorm";
+import { MockDataSource } from "src/common/data-sources/mock.data-source";
+import { NotFoundException } from "@nestjs/common";
 
-describe('CategoriesService', () => {
+describe("CategoriesService", () => {
   let service: CategoriesService;
   let mockDataSource: MockDataSource;
 
@@ -44,18 +44,18 @@ describe('CategoriesService', () => {
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('должен создать категорию', async () => {
-      const userId = 'user-1';
+  describe("create", () => {
+    it("должен создать категорию", async () => {
+      const userId = "user-1";
       const createDto = {
-        name: 'Food',
-        type: 'expense' as const,
+        name: "Food",
+        type: "expense" as const,
       };
 
       const mockCategory: Category = {
-        id: 'category-1',
-        name: 'Food',
-        type: 'expense',
+        id: "category-1",
+        name: "Food",
+        type: "expense",
         user: { id: userId } as any,
         created_at: new Date(),
       } as Category;
@@ -75,21 +75,21 @@ describe('CategoriesService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('должен вернуть все категории пользователя', async () => {
-      const userId = 'user-1';
+  describe("findAll", () => {
+    it("должен вернуть все категории пользователя", async () => {
+      const userId = "user-1";
       const mockCategories: Category[] = [
         {
-          id: 'category-1',
-          name: 'Food',
-          type: 'expense',
+          id: "category-1",
+          name: "Food",
+          type: "expense",
           user: { id: userId } as any,
           created_at: new Date(),
         } as Category,
         {
-          id: 'category-2',
-          name: 'Salary',
-          type: 'income',
+          id: "category-2",
+          name: "Salary",
+          type: "income",
           user: { id: userId } as any,
           created_at: new Date(),
         } as Category,
@@ -106,14 +106,14 @@ describe('CategoriesService', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('должен вернуть категорию по ID', async () => {
-      const userId = 'user-1';
-      const categoryId = 'category-1';
+  describe("findOne", () => {
+    it("должен вернуть категорию по ID", async () => {
+      const userId = "user-1";
+      const categoryId = "category-1";
       const mockCategory: Category = {
         id: categoryId,
-        name: 'Food',
-        type: 'expense',
+        name: "Food",
+        type: "expense",
         user: { id: userId } as any,
         created_at: new Date(),
       } as Category;
@@ -128,9 +128,9 @@ describe('CategoriesService', () => {
       });
     });
 
-    it('должен выбросить ошибку, если категория не найдена', async () => {
-      const userId = 'user-1';
-      const categoryId = 'non-existent-category';
+    it("должен выбросить ошибку, если категория не найдена", async () => {
+      const userId = "user-1";
+      const categoryId = "non-existent-category";
 
       mockCategoryRepository.findOne.mockResolvedValue(null);
 
@@ -140,26 +140,26 @@ describe('CategoriesService', () => {
     });
   });
 
-  describe('update', () => {
-    it('должен обновить категорию', async () => {
-      const userId = 'user-1';
-      const categoryId = 'category-1';
+  describe("update", () => {
+    it("должен обновить категорию", async () => {
+      const userId = "user-1";
+      const categoryId = "category-1";
       const updateDto = {
-        name: 'Updated Food',
-        type: 'expense' as const,
+        name: "Updated Food",
+        type: "expense" as const,
       };
 
       const existingCategory: Category = {
         id: categoryId,
-        name: 'Food',
-        type: 'expense',
+        name: "Food",
+        type: "expense",
         user: { id: userId } as any,
         created_at: new Date(),
       } as Category;
 
       const updatedCategory: Category = {
         ...existingCategory,
-        name: 'Updated Food',
+        name: "Updated Food",
       } as Category;
 
       mockCategoryRepository.preload.mockResolvedValue(updatedCategory);
@@ -172,11 +172,11 @@ describe('CategoriesService', () => {
       expect(mockCategoryRepository.save).toHaveBeenCalled();
     });
 
-    it('должен выбросить ошибку, если категория не найдена', async () => {
-      const userId = 'user-1';
-      const categoryId = 'non-existent';
+    it("должен выбросить ошибку, если категория не найдена", async () => {
+      const userId = "user-1";
+      const categoryId = "non-existent";
       const updateDto = {
-        name: 'Updated Food',
+        name: "Updated Food",
       };
 
       mockCategoryRepository.preload.mockResolvedValue(null);
@@ -187,10 +187,10 @@ describe('CategoriesService', () => {
     });
   });
 
-  describe('delete', () => {
-    it('должен удалить категорию', async () => {
-      const userId = 'user-1';
-      const categoryId = 'category-1';
+  describe("delete", () => {
+    it("должен удалить категорию", async () => {
+      const userId = "user-1";
+      const categoryId = "category-1";
 
       mockCategoryRepository.delete.mockResolvedValue({ affected: 1 });
 

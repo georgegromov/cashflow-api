@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
-import { Category } from 'src/categories/entities/category.entity';
-import { AbstractRepository } from './abstract.repository';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, FindOptionsWhere } from "typeorm";
+import { Category } from "src/categories/entities/category.entity";
+import { AbstractRepository, IAbstractRepository } from "./abstract.repository";
 
 /**
  * Конкретная реализация репозитория для категорий
  * Использует паттерн Repository Pattern
  */
 @Injectable()
-export class CategoryRepository extends AbstractRepository<Category> {
+export class CategoryRepository
+  extends AbstractRepository<Category>
+  implements IAbstractRepository<Category>
+{
   constructor(
     @InjectRepository(Category)
     private readonly repository: Repository<Category>,
@@ -19,14 +22,14 @@ export class CategoryRepository extends AbstractRepository<Category> {
 
   async findAll(): Promise<Category[]> {
     return this.repository.find({
-      order: { created_at: 'DESC' },
+      order: { created_at: "DESC" },
     });
   }
 
   async findById(id: string): Promise<Category | null> {
     return this.repository.findOne({
       where: { id } as FindOptionsWhere<Category>,
-      relations: ['user'],
+      relations: ["user"],
     });
   }
 
@@ -52,23 +55,17 @@ export class CategoryRepository extends AbstractRepository<Category> {
   async findBy(condition: Partial<Category>): Promise<Category[]> {
     return this.repository.find({
       where: condition as FindOptionsWhere<Category>,
-      relations: ['user'],
-      order: { created_at: 'DESC' },
+      relations: ["user"],
+      order: { created_at: "DESC" },
     });
   }
 
-  /**
-   * Найти все категории пользователя
-   */
   async findByUserId(userId: string): Promise<Category[]> {
     return this.repository.find({
       where: { user: { id: userId } } as FindOptionsWhere<Category>,
     });
   }
 
-  /**
-   * Найти категорию пользователя по ID
-   */
   async findByIdAndUserId(
     id: string,
     userId: string,

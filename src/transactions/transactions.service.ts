@@ -3,23 +3,23 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Transaction } from './entities/transaction.entity';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Transaction } from "./entities/transaction.entity";
 import {
   Repository,
   MoreThanOrEqual,
   LessThanOrEqual,
   Between,
   FindOptionsWhere,
-} from 'typeorm';
-import { ICreateTransactionDto } from './interfaces/transactions.interface';
-import { Category } from 'src/categories/entities/category.entity';
+} from "typeorm";
+import { ICreateTransactionDto } from "./interfaces/transactions.interface";
+import { Category } from "src/categories/entities/category.entity";
 import {
   FinancialAnalyticsDto,
   CategoryAnalyticsDto,
-} from './dto/analytics-response.dto';
-import { TransactionSubject } from 'src/common/observers/transaction.observer';
+} from "./dto/analytics-response.dto";
+import { TransactionSubject } from "src/common/observers/transaction.observer";
 
 @Injectable()
 export class TransactionsService {
@@ -47,7 +47,7 @@ export class TransactionsService {
       });
 
       if (!category) {
-        this.logger.error('category does not exist or not belongs to user');
+        this.logger.error("category does not exist or not belongs to user");
         throw new BadRequestException(
           `category with id:${createTransactionDto.categoryId} does not exists`,
         );
@@ -73,7 +73,7 @@ export class TransactionsService {
   findAll(userId: string) {
     return this.transactionsRepository.find({
       where: { user: { id: userId } },
-      order: { created_at: 'DESC' },
+      order: { created_at: "DESC" },
     });
   }
 
@@ -131,7 +131,7 @@ export class TransactionsService {
       {
         categoryId: string | null;
         categoryName: string | null;
-        categoryType: 'income' | 'expense' | null;
+        categoryType: "income" | "expense" | null;
         incomeAmount: number;
         expenseAmount: number;
         incomeCount: number;
@@ -147,7 +147,7 @@ export class TransactionsService {
       const categoryType = transaction.category?.type || null;
 
       // Группировка по категориям
-      const key = categoryId || 'uncategorized';
+      const key = categoryId || "uncategorized";
       if (!categoryMap.has(key)) {
         categoryMap.set(key, {
           categoryId,
@@ -161,7 +161,7 @@ export class TransactionsService {
       }
 
       const categoryData = categoryMap.get(key)!;
-      if (transaction.type === 'income') {
+      if (transaction.type === "income") {
         categoryData.incomeAmount += amount;
         categoryData.incomeCount++;
       } else {
@@ -178,7 +178,7 @@ export class TransactionsService {
     let totalExpense = 0;
     for (const transaction of transactions) {
       const amount = Number(transaction.amount);
-      if (transaction.type === 'income') {
+      if (transaction.type === "income") {
         totalIncome += amount;
       } else {
         totalExpense += amount;
@@ -189,8 +189,8 @@ export class TransactionsService {
       // Для категорий типа income показываем только income транзакции
       // Для категорий типа expense показываем только expense транзакции
       // Для транзакций без категории показываем оба типа
-      const isIncomeCategory = categoryData.categoryType === 'income';
-      const isExpenseCategory = categoryData.categoryType === 'expense';
+      const isIncomeCategory = categoryData.categoryType === "income";
+      const isExpenseCategory = categoryData.categoryType === "expense";
 
       let totalAmount = 0;
       let transactionCount = 0;
@@ -219,7 +219,7 @@ export class TransactionsService {
       if (totalAmount > 0) {
         categoryAnalytics.push({
           categoryId: categoryData.categoryId,
-          categoryName: categoryData.categoryName || 'Без категории',
+          categoryName: categoryData.categoryName || "Без категории",
           categoryType: categoryData.categoryType,
           totalAmount: Number(totalAmount.toFixed(2)),
           transactionCount,
@@ -247,16 +247,16 @@ export class TransactionsService {
     // Валидация дат
     if (startDate && isNaN(Date.parse(startDate))) {
       throw new BadRequestException(
-        'startDate должен быть валидной датой в формате YYYY-MM-DD',
+        "startDate должен быть валидной датой в формате YYYY-MM-DD",
       );
     }
     if (endDate && isNaN(Date.parse(endDate))) {
       throw new BadRequestException(
-        'endDate должен быть валидной датой в формате YYYY-MM-DD',
+        "endDate должен быть валидной датой в формате YYYY-MM-DD",
       );
     }
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-      throw new BadRequestException('startDate не может быть позже endDate');
+      throw new BadRequestException("startDate не может быть позже endDate");
     }
 
     // Строим условия для фильтрации по датам в SQL
@@ -270,7 +270,7 @@ export class TransactionsService {
 
     const transactions = await this.transactionsRepository.find({
       where: whereConditions as FindOptionsWhere<Transaction>,
-      relations: ['category'],
+      relations: ["category"],
     });
 
     // Инициализируем счетчики
@@ -282,7 +282,7 @@ export class TransactionsService {
     // Обрабатываем каждую транзакцию для общей статистики
     for (const transaction of transactions) {
       const amount = Number(transaction.amount);
-      if (transaction.type === 'income') {
+      if (transaction.type === "income") {
         totalIncome += amount;
         incomeCount++;
       } else {
@@ -318,16 +318,16 @@ export class TransactionsService {
     // Валидация дат
     if (startDate && isNaN(Date.parse(startDate))) {
       throw new BadRequestException(
-        'startDate должен быть валидной датой в формате YYYY-MM-DD',
+        "startDate должен быть валидной датой в формате YYYY-MM-DD",
       );
     }
     if (endDate && isNaN(Date.parse(endDate))) {
       throw new BadRequestException(
-        'endDate должен быть валидной датой в формате YYYY-MM-DD',
+        "endDate должен быть валидной датой в формате YYYY-MM-DD",
       );
     }
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-      throw new BadRequestException('startDate не может быть позже endDate');
+      throw new BadRequestException("startDate не может быть позже endDate");
     }
 
     // Строим условия для фильтрации по датам в SQL
@@ -341,7 +341,7 @@ export class TransactionsService {
 
     const transactions = await this.transactionsRepository.find({
       where: whereConditions as FindOptionsWhere<Transaction>,
-      relations: ['category'],
+      relations: ["category"],
     });
 
     // Все аналитические подсчеты выполняются алгоритмически на бекенде

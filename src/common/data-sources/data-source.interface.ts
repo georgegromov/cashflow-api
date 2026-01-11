@@ -1,6 +1,6 @@
-import { Transaction } from 'src/transactions/entities/transaction.entity';
-import { Category } from 'src/categories/entities/category.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Transaction } from "src/transactions/entities/transaction.entity";
+import { Category } from "src/categories/entities/category.entity";
+import { User } from "src/users/entities/user.entity";
 
 /**
  * Интерфейс источника данных

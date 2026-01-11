@@ -1,23 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { IDataSource } from './data-source.interface';
-import { DatabaseDataSource } from './database.data-source';
-import { MockDataSource } from './mock.data-source';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { IDataSource } from "./data-source.interface";
+import { DatabaseDataSource } from "./database.data-source";
+import { MockDataSource } from "./mock.data-source";
 
 /**
  * Типы источников данных
  */
 export enum DataSourceType {
-  DATABASE = 'database',
-  MOCK = 'mock',
+  DATABASE = "database",
+  MOCK = "mock",
 }
-
+interface IDataSourceFactory {
+  createDataSource(): IDataSource;
+}
 /**
  * Абстрактная фабрика для создания источников данных
  * Реализует паттерн Abstract Factory
  */
 @Injectable()
-export abstract class DataSourceFactory {
+export abstract class DataSourceFactory implements IDataSourceFactory {
   /**
    * Создать источник данных
    */
@@ -29,7 +31,10 @@ export abstract class DataSourceFactory {
  * Реализует паттерн Factory Method
  */
 @Injectable()
-export class DataSourceFactoryImpl extends DataSourceFactory {
+export class DataSourceFactoryImpl
+  extends DataSourceFactory
+  implements IDataSourceFactory
+{
   constructor(
     private readonly configService: ConfigService,
     private readonly databaseDataSource: DatabaseDataSource,
@@ -40,9 +45,9 @@ export class DataSourceFactoryImpl extends DataSourceFactory {
 
   createDataSource(): IDataSource {
     const dataSourceType = (this.configService.get<string>(
-      'DATA_SOURCE_TYPE',
-      'database',
-    ) || 'database') as DataSourceType;
+      "DATA_SOURCE_TYPE",
+      "database",
+    ) || "database") as DataSourceType;
 
     switch (dataSourceType) {
       case DataSourceType.MOCK:
@@ -53,9 +58,6 @@ export class DataSourceFactoryImpl extends DataSourceFactory {
     }
   }
 
-  /**
-   * Создать источник данных указанного типа
-   */
   createDataSourceByType(type: DataSourceType): IDataSource {
     switch (type) {
       case DataSourceType.MOCK:

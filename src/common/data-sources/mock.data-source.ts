@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Transaction } from 'src/transactions/entities/transaction.entity';
-import { Category } from 'src/categories/entities/category.entity';
-import { User } from 'src/users/entities/user.entity';
-import { IDataSource } from './data-source.interface';
+import { Injectable } from "@nestjs/common";
+import { Transaction } from "src/transactions/entities/transaction.entity";
+import { Category } from "src/categories/entities/category.entity";
+import { User } from "src/users/entities/user.entity";
+import { IDataSource } from "./data-source.interface";
 
 /**
  * Моковая реализация источника данных для тестирования
@@ -40,7 +40,7 @@ export class MockDataSource implements IDataSource {
     const newTransaction: Transaction = {
       id: `mock-transaction-${++this.transactionCounter}`,
       amount: transaction.amount ?? 0,
-      type: transaction.type ?? 'expense',
+      type: transaction.type ?? "expense",
       note: transaction.note ?? null,
       user: { id: userId } as User,
       category: transaction.category ?? null,
@@ -70,8 +70,8 @@ export class MockDataSource implements IDataSource {
   ): Promise<Category> {
     const newCategory: Category = {
       id: `mock-category-${++this.categoryCounter}`,
-      name: category.name ?? '',
-      type: category.type ?? 'expense',
+      name: category.name ?? "",
+      type: category.type ?? "expense",
       user: { id: userId } as User,
       created_at: new Date(),
     } as Category;
@@ -86,7 +86,7 @@ export class MockDataSource implements IDataSource {
   ): Promise<Category> {
     const existing = await this.getCategoryById(id, userId);
     if (!existing) {
-      throw new Error('Category not found');
+      throw new Error("Category not found");
     }
     Object.assign(existing, category);
     this.categories.set(id, existing);
@@ -116,8 +116,8 @@ export class MockDataSource implements IDataSource {
   createUser(user: Partial<User>): Promise<User> {
     const newUser: User = {
       id: `mock-user-${++this.userCounter}`,
-      username: user.username ?? '',
-      password_hash: user.password_hash ?? '',
+      username: user.username ?? "",
+      password_hash: user.password_hash ?? "",
       created_at: new Date(),
     } as User;
     this.users.set(newUser.id, newUser);
