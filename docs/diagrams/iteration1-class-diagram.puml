@@ -1,0 +1,122 @@
+@startuml Итерация 1 - Базовая функциональность (v1.0)
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+title Итерация 1: Базовая функциональность (UC1-UC5)
+
+' Сущности предметной области
+class User {
+  - id
+  - username
+  - password_hash
+  - created_at
+  + transactions
+}
+
+class Transaction {
+  - id
+  - amount
+  - type
+  - note
+  - created_at
+  + user
+}
+
+' Сервисы
+class AuthService {
+  - usersRepository
+  + signUp()
+  + signIn()
+  + validateUser()
+}
+
+class UsersService {
+  - usersRepository
+  + create()
+  + findAll()
+  + findById()
+  + findByUsername()
+}
+
+class TransactionsService {
+  - transactionsRepository
+  + create()
+  + findAll()
+  + findOne()
+}
+
+' Контроллеры
+class AuthController {
+  + signUp()
+  + signIn()
+}
+
+class TransactionsController {
+  + create()
+  + findAll()
+  + findOne()
+}
+
+' DTO
+class SignUpDto {
+  + username
+  + password
+}
+
+class SignInDto {
+  + username
+  + password
+}
+
+class CreateTransactionDto {
+  + amount
+  + type
+  + note
+}
+
+' TypeORM Repositories
+class UserRepository {
+  + find()
+  + findOne()
+  + create()
+  + save()
+  + delete()
+}
+
+class TransactionRepository {
+  + find()
+  + findOne()
+  + create()
+  + save()
+  + delete()
+}
+
+' Связи
+User "1" *-- "many" Transaction : has
+
+AuthController --> AuthService
+TransactionsController --> TransactionsService
+
+AuthService --> UserRepository
+UsersService --> UserRepository
+TransactionsService --> TransactionRepository
+
+UserRepository ..> User : manages
+TransactionRepository ..> Transaction : manages
+
+AuthController ..> SignUpDto
+AuthController ..> SignInDto
+TransactionsController ..> CreateTransactionDto
+
+note right of TransactionsService
+  **Прямое использование TypeORM**
+  Нет абстракции для работы с данными
+end note
+
+note right of User
+  **Базовая модель данных**
+  Связь User 1:N Transaction
+end note
+
+@enduml

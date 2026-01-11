@@ -1,0 +1,184 @@
+@startuml Итерация 2 - Категории и финансовая аналитика (v1.0)
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+title Итерация 2: Категории и финансовая аналитика (UC6-UC12)
+
+' Сущности предметной области
+class User {
+  - id
+  - username
+  - password_hash
+  - created_at
+  + transactions
+  + categories
+}
+
+class Transaction {
+  - id
+  - amount
+  - type
+  - note
+  - created_at
+  + user
+  + category
+}
+
+class Category {
+  - id
+  - name
+  - type
+  - created_at
+  + user
+}
+
+' Сервисы
+class AuthService {
+  - usersRepository
+  + signUp()
+  + signIn()
+}
+
+class TransactionsService {
+  - transactionsRepository
+  - categoriesRepository
+  + create()
+  + findAll()
+  + findOne()
+  + getFinancialAnalytics()
+  + getCategoryAnalytics()
+}
+
+class CategoriesService {
+  - categoriesRepository
+  + create()
+  + findAll()
+  + findOne()
+  + update()
+  + delete()
+}
+
+' Контроллеры
+class TransactionsController {
+  + create()
+  + findAll()
+  + findOne()
+  + getFinancialAnalytics()
+  + getCategoryAnalytics()
+}
+
+class CategoriesController {
+  + create()
+  + findAll()
+  + findOne()
+  + update()
+  + delete()
+}
+
+' DTO для аналитики
+class FinancialAnalyticsDto {
+  + totalIncome
+  + totalExpense
+  + balance
+}
+
+class CategoryAnalyticsDto {
+  + categoryId
+  + categoryName
+  + totalAmount
+  + transactionCount
+  + percentage
+}
+
+class AnalyticsQueryDto {
+  + startDate
+  + endDate
+}
+
+class CreateCategoryDto {
+  + name
+  + type
+}
+
+class UpdateCategoryDto {
+  + name
+  + type
+}
+
+class CreateTransactionDto {
+  + amount
+  + type
+  + note
+  + categoryId
+}
+
+' TypeORM Repositories
+class UserRepository {
+  + find()
+  + findOne()
+  + create()
+  + save()
+  + delete()
+}
+
+class TransactionRepository {
+  + find()
+  + findOne()
+  + create()
+  + save()
+  + delete()
+}
+
+class CategoryRepository {
+  + find()
+  + findOne()
+  + create()
+  + save()
+  + update()
+  + delete()
+}
+
+' Связи
+User "1" *-- "many" Transaction : has
+User "1" *-- "many" Category : has
+Transaction "many" --> "0..1" Category : belongs to
+
+TransactionsController --> TransactionsService
+CategoriesController --> CategoriesService
+
+TransactionsService --> TransactionRepository
+TransactionsService --> CategoryRepository
+CategoriesService --> CategoryRepository
+AuthService --> UserRepository
+
+TransactionRepository ..> Transaction : manages
+CategoryRepository ..> Category : manages
+UserRepository ..> User : manages
+
+TransactionsController ..> AnalyticsQueryDto
+TransactionsController ..> FinancialAnalyticsDto
+TransactionsController ..> CategoryAnalyticsDto
+TransactionsController ..> CreateTransactionDto
+CategoriesController ..> CreateCategoryDto
+CategoriesController ..> UpdateCategoryDto
+
+note right of TransactionsService
+  **Добавлена финансовая аналитика**
+  - getFinancialAnalytics()
+  - getCategoryAnalytics()
+  - Фильтрация по датам
+end note
+
+note right of Category
+  **Новая сущность**
+  Связь User 1:N Category
+  Связь Category 1:N Transaction
+end note
+
+note right of CategoriesService
+  **Полный CRUD для категорий**
+  create, findAll, findOne, update, delete
+end note
+
+@enduml

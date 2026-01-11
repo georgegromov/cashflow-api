@@ -1,0 +1,189 @@
+@startuml Итерация 4 - Тестирование и упаковка (v2.0)
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+title Итерация 4: Тестирование и упаковка (v2.0)
+
+' Сущности предметной области
+class User {
+  - id
+  - username
+  - password_hash
+  - created_at
+}
+
+class Transaction {
+  - id
+  - amount
+  - type
+  - note
+  - created_at
+}
+
+class Category {
+  - id
+  - name
+  - type
+  - created_at
+}
+
+' Repository Pattern
+abstract class AbstractRepository {
+  + {abstract} findAll()
+  + {abstract} findById()
+  + {abstract} create()
+  + {abstract} update()
+  + {abstract} delete()
+}
+
+class TransactionRepository extends AbstractRepository {
+}
+
+class CategoryRepository extends AbstractRepository {
+}
+
+' Strategy Pattern
+interface IDataSource {
+  + getTransactions()
+  + createTransaction()
+  + getCategories()
+}
+
+class DatabaseDataSource implements IDataSource {
+}
+
+class MockDataSource implements IDataSource {
+  - transactions
+  - categories
+  - users
+  + clear()
+}
+
+' Сервисы
+class TransactionsService {
+  - transactionsRepository
+  - transactionSubject
+  + create()
+  + findAll()
+  + getFinancialAnalytics()
+}
+
+class CategoriesService {
+  - categoryRepository
+  + create()
+  + findAll()
+  + update()
+  + delete()
+}
+
+class AuthService {
+  - usersRepository
+  + signUp()
+  + signIn()
+}
+
+' Тестовые классы
+package "tests" {
+  class TransactionsServiceSpec {
+    - service
+    - mockDataSource
+    + should create transaction()
+    + should find all transactions()
+    + should get financial analytics()
+  }
+  
+  class CategoriesServiceSpec {
+    - service
+    - mockDataSource
+    + should create category()
+    + should update category()
+    + should delete category()
+  }
+  
+  class AuthServiceSpec {
+    - service
+    - mockDataSource
+    + should sign up user()
+    + should sign in user()
+    + should validate user()
+  }
+  
+  class TransactionsControllerSpec {
+    - controller
+    - mockService
+    + should create transaction()
+    + should return all transactions()
+  }
+  
+  class CategoriesControllerSpec {
+    - controller
+    - mockService
+    + should create category()
+    + should update category()
+  }
+}
+
+' Docker конфигурация
+package "docker" {
+  class Dockerfile {
+    + STAGE 1: BUILD
+    + STAGE 2: RUN
+    + FROM node:22.13.0-alpine
+    + EXPOSE 8080
+  }
+  
+  class DockerCompose {
+    + service api
+    + service database
+    + network internal
+    + volume pg_data
+  }
+}
+
+' Связи
+TransactionsServiceSpec ..> TransactionsService : tests
+TransactionsServiceSpec ..> MockDataSource : uses
+CategoriesServiceSpec ..> CategoriesService : tests
+CategoriesServiceSpec ..> MockDataSource : uses
+AuthServiceSpec ..> AuthService : tests
+AuthServiceSpec ..> MockDataSource : uses
+
+TransactionsControllerSpec ..> TransactionsController : tests
+CategoriesControllerSpec ..> CategoriesController : tests
+
+TransactionsService --> TransactionRepository : uses
+TransactionsService --> MockDataSource : uses (in tests)
+CategoriesService --> CategoryRepository : uses
+CategoriesService --> MockDataSource : uses (in tests)
+
+MockDataSource ..> Transaction : manages
+MockDataSource ..> Category : manages
+MockDataSource ..> User : manages
+
+note right of MockDataSource
+  **Использование в тестах**
+  Изоляция от реальной БД
+  Быстрое выполнение тестов
+end note
+
+note right of TransactionsServiceSpec
+  **Модульные тесты**
+  Использование MockDataSource
+  Покрытие основных методов
+end note
+
+note right of Dockerfile
+  **Упаковка в Docker**
+  Многоэтапная сборка
+  Оптимизация размера образа
+end note
+
+note right of DockerCompose
+  **Оркестрация контейнеров**
+  API + Database
+  Изолированная сеть
+  Health checks
+end note
+
+@enduml

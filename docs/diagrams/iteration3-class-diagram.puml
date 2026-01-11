@@ -1,0 +1,221 @@
+@startuml Итерация 3 - Рефакторинг и паттерны проектирования (v2.0)
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+title Итерация 3: Рефакторинг и паттерны проектирования (v2.0)
+
+' Сущности предметной области
+class User {
+  - id
+  - username
+  - password_hash
+  - created_at
+  + transactions
+  + categories
+}
+
+class Transaction {
+  - id
+  - amount
+  - type
+  - note
+  - created_at
+  + user
+  + category
+}
+
+class Category {
+  - id
+  - name
+  - type
+  - created_at
+  + user
+}
+
+' Repository Pattern
+abstract class AbstractRepository {
+  + {abstract} findAll()
+  + {abstract} findById()
+  + {abstract} create()
+  + {abstract} update()
+  + {abstract} delete()
+  + {abstract} findBy()
+}
+
+class TransactionRepository extends AbstractRepository {
+  - repository
+  + findByUserId()
+  + findByIdAndUserId()
+}
+
+class CategoryRepository extends AbstractRepository {
+  - repository
+  + findByUserId()
+  + findByIdAndUserId()
+}
+
+' Strategy Pattern
+interface IDataSource {
+  + getTransactions()
+  + getTransactionById()
+  + createTransaction()
+  + getCategories()
+  + getCategoryById()
+  + createCategory()
+  + updateCategory()
+  + deleteCategory()
+  + getUserById()
+  + getUserByUsername()
+  + createUser()
+}
+
+class DatabaseDataSource implements IDataSource {
+  - transactionsRepository
+  - categoriesRepository
+  - usersRepository
+}
+
+class MockDataSource implements IDataSource {
+  - transactions
+  - categories
+  - users
+  + clear()
+}
+
+' Abstract Factory Pattern
+abstract class DataSourceFactory {
+  + {abstract} createDataSource()
+}
+
+class DataSourceFactoryImpl extends DataSourceFactory {
+  - configService
+  - databaseDataSource
+  - mockDataSource
+  + createDataSource()
+  + createDataSourceByType()
+}
+
+enum DataSourceType {
+  DATABASE
+  MOCK
+}
+
+' Observer Pattern
+interface ITransactionObserver {
+  + onTransactionCreated()
+  + onTransactionUpdated()
+  + onTransactionDeleted()
+}
+
+abstract class AbstractTransactionObserver implements ITransactionObserver {
+  + onTransactionCreated()
+  + onTransactionUpdated()
+  + onTransactionDeleted()
+}
+
+class AnalyticsObserver extends AbstractTransactionObserver {
+  - logger
+  + onTransactionCreated()
+  + onTransactionUpdated()
+  + onTransactionDeleted()
+}
+
+class TransactionSubject {
+  - observers
+  + attach()
+  + detach()
+  + notifyTransactionCreated()
+  + notifyTransactionUpdated()
+  + notifyTransactionDeleted()
+}
+
+' Сервисы
+class TransactionsService {
+  - transactionsRepository
+  - categoriesRepository
+  - transactionSubject
+  + create()
+  + findAll()
+  + findOne()
+  + getFinancialAnalytics()
+  + getCategoryAnalytics()
+}
+
+class CategoriesService {
+  - categoriesRepository
+  - categoryRepository
+  + create()
+  + findAll()
+  + findOne()
+  + update()
+  + delete()
+}
+
+' Common Module
+note top of AbstractRepository
+  **Модуль common/**
+  Содержит все паттерны проектирования:
+  - Repository Pattern
+  - Strategy Pattern
+  - Abstract Factory Pattern
+  - Observer Pattern
+end note
+
+' Связи
+User "1" *-- "many" Transaction : has
+User "1" *-- "many" Category : has
+Transaction "many" --> "0..1" Category : belongs to
+
+TransactionRepository ..> Transaction : uses
+CategoryRepository ..> Category : uses
+
+DatabaseDataSource ..> Transaction : uses
+DatabaseDataSource ..> Category : uses
+DatabaseDataSource ..> User : uses
+MockDataSource ..> Transaction : uses
+MockDataSource ..> Category : uses
+MockDataSource ..> User : uses
+
+DataSourceFactoryImpl ..> DatabaseDataSource : creates
+DataSourceFactoryImpl ..> MockDataSource : creates
+DataSourceFactoryImpl ..> DataSourceType : uses
+
+TransactionSubject "1" o-- "many" ITransactionObserver : notifies
+AnalyticsObserver ..|> ITransactionObserver : implements
+
+TransactionsService --> TransactionRepository : uses
+TransactionsService --> TransactionSubject : uses
+CategoriesService --> CategoryRepository : uses
+
+note right of AbstractRepository
+  **Repository Pattern**
+  Абстракция для работы с данными
+  Изоляция от TypeORM
+end note
+
+note right of IDataSource
+  **Strategy Pattern**
+  Разные стратегии источников данных
+  DatabaseDataSource и MockDataSource
+end note
+
+note right of DataSourceFactory
+  **Abstract Factory Pattern**
+  Создание источников данных
+  Конфигурируемо через переменные окружения
+end note
+
+note right of TransactionSubject
+  **Observer Pattern**
+  Уведомление наблюдателей о событиях
+  Слабая связанность компонентов
+end note
+
+note right of TransactionsService
+  **Рефакторинг сервисов**
+  Использование Repository Pattern
+  Интеграция Observer Pattern
+end note
+
+@enduml

@@ -42,6 +42,41 @@
 
 Диаграмма последовательности, показывающая процесс создания источника данных через фабрику.
 
+### 6. iteration1-class-diagram.puml - Диаграмма классов (Итерация 1)
+
+Диаграмма классов для первой итерации (v1.0 - Базовая функциональность):
+- Сущности: User, Transaction
+- Сервисы: AuthService, UsersService, TransactionsService
+- Контроллеры: AuthController, TransactionsController
+- Прямое использование TypeORM репозиториев
+- Реализованные Use Cases: UC1-UC5
+
+### 7. iteration2-class-diagram.puml - Диаграмма классов (Итерация 2)
+
+Диаграмма классов для второй итерации (v1.0 - Категории и аналитика):
+- Добавлена сущность Category
+- Сервисы: CategoriesService, расширенный TransactionsService с аналитикой
+- Контроллеры: CategoriesController
+- DTO для аналитики: FinancialAnalyticsDto, CategoryAnalyticsDto
+- Реализованные Use Cases: UC6-UC12
+
+### 8. iteration3-class-diagram.puml - Диаграмма классов (Итерация 3)
+
+Диаграмма классов для третьей итерации (v2.0 - Рефакторинг и паттерны):
+- Repository Pattern: AbstractRepository, TransactionRepository, CategoryRepository
+- Strategy Pattern: IDataSource, DatabaseDataSource, MockDataSource
+- Abstract Factory Pattern: DataSourceFactory, DataSourceFactoryImpl
+- Observer Pattern: ITransactionObserver, TransactionSubject, AnalyticsObserver
+- Модуль common/ с паттернами проектирования
+
+### 9. iteration4-class-diagram.puml - Диаграмма классов (Итерация 4)
+
+Диаграмма классов для четвертой итерации (v2.0 - Тестирование и упаковка):
+- Тестовые классы: TransactionsServiceSpec, CategoriesServiceSpec, AuthServiceSpec
+- Тесты контроллеров: TransactionsControllerSpec, CategoriesControllerSpec
+- Docker конфигурация: Dockerfile, DockerCompose
+- Использование MockDataSource в тестах
+
 ## Как использовать
 
 ### Онлайн генерация
@@ -101,6 +136,10 @@ docs/diagrams/
 ├── class-diagram.puml             # Полная диаграмма классов
 ├── data-source-implementation.puml # Реализация источника данных
 ├── data-source-sequence.puml      # Последовательность создания источника данных
+├── iteration1-class-diagram.puml # Диаграмма классов - Итерация 1 (v1.0)
+├── iteration2-class-diagram.puml  # Диаграмма классов - Итерация 2 (v1.0)
+├── iteration3-class-diagram.puml  # Диаграмма классов - Итерация 3 (v2.0)
+├── iteration4-class-diagram.puml  # Диаграмма классов - Итерация 4 (v2.0)
 └── README.md                      # Этот файл
 ```
 
